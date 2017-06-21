@@ -57,7 +57,9 @@ echo $r->render($PDOdb, $sql, array(
 		'nbLine' => $nbLine
 	)
 	,'subQuery' => array()
-	,'link' => array()
+	,'link' => array(
+			'label'=>'<a href="card.php?id=@rowid@">@val@</a>'
+	)
 	,'type' => array(
 		'date_cre' => 'date' // [datetime], [hour], [money], [number], [integer]
 		,'date_maj' => 'date'

@@ -14,7 +14,6 @@ $action = GETPOST('action');
 $socid = GETPOST('socid', 'int');
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref');
-$form = new Form($db);
 
 $mode = 'view';
 if (empty($user->rights->rhum->write)) $mode = 'view'; // Force 'view' mode if can't edit object
@@ -105,7 +104,7 @@ if (empty($reshook))
 
 function _card(&$object, $action, $mode) {
 
-	global $conf, $db, $user, $langs, $form;
+	global $conf, $db, $user, $langs, $id, $socid;
 	
 	/**
 	 * View
@@ -123,7 +122,19 @@ function _card(&$object, $action, $mode) {
 	{
 		$head = rhum_prepare_head($object);
 		$picto = 'generic';
-		dol_fiche_head($head, 'card', $langs->trans("Rhumerie"), 0, $picto);
+		
+		// je détermine quel onglet sera l'onglet actif
+		$tab = GETPOST('tab');
+		if (isset($tab)) {
+			// faudrait faire un switch case...
+			$titre = $langs->trans("RhumsList");
+		} else {
+			$tab = 'card';
+			$titre = $langs->trans("Rhumerie");
+		}
+		$active = $tab;
+
+		dol_fiche_head($head, $active, $titre, 0, $picto);
 	}
 	
 	$formcore = new TFormCore;
