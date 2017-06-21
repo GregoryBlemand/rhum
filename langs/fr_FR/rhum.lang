@@ -6,10 +6,10 @@ ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.
 RhumSetup = Configuration du module Rhum
 RhumAbout = A propos du module Rhum
 
-Rhum=Rhum
+Rhumerie=Rhumerie
 
 # MENU
-TopMenuRhum=Rhum
+TopMenuRhum=Rhumerie
 
 # STATUS
 RhumStatusDraft=Brouillon (à valider)
@@ -23,12 +23,13 @@ Refused=Refusé
 Accepted=Accepté
 
 # LIST
-RhumList=Liste Rhum
+RhumerieList=Liste Rhumeries
 NoRhum=(vide)
 
 # CARD
-NewRhum=Création Rhum
-RhumCard=Fiche Rhum
+NewRhum=Création Rhumerie
+RhumCard=Fiche Rhumerie
+Rhums=Rhums
 
 # CARD TPL
 Save=Enregistrer

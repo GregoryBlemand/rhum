@@ -11,16 +11,14 @@ if(!defined('INC_FROM_DOLIBARR')) {
 }
 
 
-/* uncomment
-
 
 dol_include_once('/rhum/class/rhum.class.php');
 
 $PDOdb=new TPDOdb;
 
+$o=new TRhumerie;
+$o->init_db_by_vars($PDOdb);
+
 $o=new TRhum;
 $o->init_db_by_vars($PDOdb);
 
-$o=new TRhumChild;
-$o->init_db_by_vars($PDOdb);
-*/

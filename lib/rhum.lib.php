@@ -57,10 +57,10 @@ function rhumAdminPrepareHead()
 /**
  * Return array of tabs to used on pages for third parties cards.
  *
- * @param 	TRhum	$object		Object company shown
+ * @param 	TRhumerie	$object		Object company shown
  * @return 	array				Array of tabs
  */
-function rhum_prepare_head(TRhum $object)
+function rhum_prepare_head(TRhumerie $object)
 {
     global $db, $langs, $conf, $user;
     $h = 0;
@@ -70,6 +70,11 @@ function rhum_prepare_head(TRhum $object)
     $head[$h][2] = 'card';
     $h++;
 	
+    $head[$h][0] = dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId();
+    $head[$h][1] = $langs->trans("Rhums");
+    $head[$h][2] = 'rhum';
+    $h++;
+    
 	// Show more tabs from modules
     // Entries must be declared in modules descriptor with line
     // $this->tabs = array('entity:+tabname:Title:@rhum:/rhum/mypage.php?id=__ID__');   to add new tab

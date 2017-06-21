@@ -11,15 +11,17 @@ if(empty($user->rights->rhum->read)) accessforbidden();
 $langs->load('rhum@rhum');
 
 $action = GETPOST('action');
+$socid = GETPOST('socid', 'int');
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref');
+$form = new Form($db);
 
 $mode = 'view';
 if (empty($user->rights->rhum->write)) $mode = 'view'; // Force 'view' mode if can't edit object
 else if ($action == 'create' || $action == 'edit') $mode = 'edit';
 
 $PDOdb = new TPDOdb;
-$object = new TRhum;
+$object = new TRhumerie;
 
 if (!empty($id)) $object->load($PDOdb, $id);
 elseif (!empty($ref)) $object->loadBy($PDOdb, $ref, 'ref');
@@ -93,72 +95,86 @@ if (empty($reshook))
 			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
 			exit;
 			break;
+		default:
+			
+			_card($object, $action, $mode);
 	}
 }
 
 
-/**
- * View
- */
 
-$title=$langs->trans("Rhum");
-llxHeader('',$title);
+function _card(&$object, $action, $mode) {
 
-if ($action == 'create' && $mode == 'edit')
-{
-	load_fiche_titre($langs->trans("NewRhum"));
-	dol_fiche_head();
-}
-else
-{
-	$head = rhum_prepare_head($object);
-	$picto = 'generic';
-	dol_fiche_head($head, 'card', $langs->trans("Rhum"), 0, $picto);
-}
-
-$formcore = new TFormCore;
-$formcore->Set_typeaff($mode);
-
-$form = new Form($db);
-
-$formconfirm = getFormConfirm($PDOdb, $form, $object, $action);
-if (!empty($formconfirm)) echo $formconfirm;
-
-$TBS=new TTemplateTBS();
-$TBS->TBS->protect=false;
-$TBS->TBS->noerr=true;
-
-if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_rhum');
-
-$linkback = '<a href="'.dol_buildpath('/rhum/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
-print $TBS->render('tpl/card.tpl.php'
-	,array() // Block
-	,array(
-		'object'=>$object
-		,'view' => array(
-			'mode' => $mode
-			,'action' => 'save'
-			,'urlcard' => dol_buildpath('/rhum/card.php', 1)
-			,'urllist' => dol_buildpath('/rhum/list.php', 1)
-			,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object->generic, 'ref', $linkback, 1, 'ref', 'ref', '')
-			,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
-//			,'showNote' => $formcore->zonetexte('', 'note', $object->note, 80, 8)
-			,'showStatus' => $object->getLibStatut(1)
+	global $conf, $db, $user, $langs, $form;
+	
+	/**
+	 * View
+	 */
+	
+	$title=$langs->trans("Rhumerie");
+	llxHeader('',$title);
+	
+	if ($action == 'create' && $mode == 'edit')
+	{
+		load_fiche_titre($langs->trans("NewRhum"));
+		dol_fiche_head();
+	}
+	else
+	{
+		$head = rhum_prepare_head($object);
+		$picto = 'generic';
+		dol_fiche_head($head, 'card', $langs->trans("Rhumerie"), 0, $picto);
+	}
+	
+	$formcore = new TFormCore;
+	$formcore->Set_typeaff($mode);
+	
+	$form = new Form($db);
+	
+	$thirdparty_static = new Societe($db);
+	$thirdparty_static->fetch($object->fk_soc);	
+	
+	$formconfirm = getFormConfirm($PDOdb, $form, $object, $action);
+	if (!empty($formconfirm)) echo $formconfirm;
+	
+	$TBS=new TTemplateTBS();
+	$TBS->TBS->protect=false;
+	$TBS->TBS->noerr=true;
+	
+	if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_rhum');
+	
+	$linkback = '<a href="'.dol_buildpath('/rhum/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
+	print $TBS->render('tpl/card.tpl.php'
+		,array() // Block
+		,array(
+			'object'=>$object
+			,'view' => array(
+				'mode' => $mode
+				,'action' => 'save'
+				,'urlcard' => dol_buildpath('/rhum/card.php', 1)
+				,'urllist' => dol_buildpath('/rhum/list.php', 1)
+				,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object->generic, 'ref', $linkback, 1, 'ref', 'ref', '')
+				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
+				,'showFk_soc' => $mode == "view" ? $thirdparty_static->getNomUrl(1) : $form->select_company($object->fk_soc,'socid','',1)
+	//			,'showAdresse' => $formcore->zonetexte('', 'adresse', $object->adresse, 80, 8)
+				,'showStatus' => $object->getLibStatut(1)
+			)
+			,'langs' => $langs
+			,'user' => $user
+			,'conf' => $conf
+			,'TRhum' => array(
+				'STATUS_DRAFT' => TRhumerie::STATUS_DRAFT
+				,'STATUS_VALIDATED' => TRhumerie::STATUS_VALIDATED
+				,'STATUS_REFUSED' => TRhumerie::STATUS_REFUSED
+				,'STATUS_ACCEPTED' => TRhumerie::STATUS_ACCEPTED
+			)
 		)
-		,'langs' => $langs
-		,'user' => $user
-		,'conf' => $conf
-		,'TRhum' => array(
-			'STATUS_DRAFT' => TRhum::STATUS_DRAFT
-			,'STATUS_VALIDATED' => TRhum::STATUS_VALIDATED
-			,'STATUS_REFUSED' => TRhum::STATUS_REFUSED
-			,'STATUS_ACCEPTED' => TRhum::STATUS_ACCEPTED
-		)
-	)
-);
+	);
+	
+	if ($mode == 'edit') echo $formcore->end_form();
+	
+	if ($mode == 'view' && $object->getId()) $somethingshown = $form->showLinkedObjectBlock($object->generic);
+	
+	llxFooter();
 
-if ($mode == 'edit') echo $formcore->end_form();
-
-if ($mode == 'view' && $object->getId()) $somethingshown = $form->showLinkedObjectBlock($object->generic);
-
-llxFooter();
+}

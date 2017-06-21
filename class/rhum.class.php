@@ -9,8 +9,8 @@ if (!class_exists('TObjetStd'))
 	require_once dirname(__FILE__).'/../config.php';
 }
 
-
-class TRhum extends TObjetStd
+// Une rhumerie est un objet contenant des rhums et étant assigné à un tiers (gérant)
+class TRhumerie extends TObjetStd
 {
 	/**
 	 * Draft status
@@ -41,25 +41,23 @@ class TRhum extends TObjetStd
 	{
 		global $conf,$langs,$db;
 		
-		$this->set_table(MAIN_DB_PREFIX.'rhum');
+		$this->set_table(MAIN_DB_PREFIX.'rhumerie');
 		
 		$this->add_champs('ref', array('type' => 'string', 'length' => 80, 'index' => true));
 		$this->add_champs('label', array('type' => 'string'));
+		$this->add_champs('adresse', array('type' => 'string'));
 		$this->add_champs('status', array('type' => 'integer'));
 		
-		$this->add_champs('entity,fk_user_author', array('type' => 'integer', 'index' => true));
+		$this->add_champs('entity,fk_user_author,fk_soc', array('type' => 'integer', 'index' => true));
 //		$this->add_champs('date_other,date_other_2', array('type' => 'date'));
 //		$this->add_champs('note', array('type' => 'text'));
-		
-		$this->_init_vars();
-		$this->start();
-		
-//		$this->setChild('TRhumChild','fk_rhum');
 		
 		if (!class_exists('GenericObject')) require_once DOL_DOCUMENT_ROOT.'/core/class/genericobject.class.php';
 		$this->generic = new GenericObject($db);
 		$this->generic->table_element = $this->get_table();
-		$this->generic->element = 'rhum';
+		$this->generic->element = 'rhumerie';
+		
+		$this->setChild('TRhum','fk_rhumerie');
 		
 		$this->status = self::STATUS_DRAFT;
 		$this->entity = $conf->entity;
@@ -154,7 +152,7 @@ class TRhum extends TObjetStd
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 		
 		$mask = !empty($conf->global->MYMODULE_REF_MASK) ? $conf->global->MYMODULE_REF_MASK : 'MM{yy}{mm}-{0000}';
-		$numero = get_next_value($db, $mask, 'rhum', 'ref');
+		$numero = get_next_value($db, $mask, 'rhumerie', 'ref');
 		
 		return $numero;
 	}
@@ -184,7 +182,7 @@ class TRhum extends TObjetStd
 		global $langs;
 
         $result='';
-        $label = '<u>' . $langs->trans("ShowRhum") . '</u>';
+        $label = '<u>' . $langs->trans("ShowRhumerie") . '</u>';
         if (! empty($this->ref)) $label.= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
         
         $linkclose = '" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
@@ -208,7 +206,7 @@ class TRhum extends TObjetStd
 		
 		if (empty($PDOdb)) $PDOdb = new TPDOdb;
 		
-		$object = new TRhum;
+		$object = new TRhumerie;
 		$object->load($PDOdb, $id, false);
 		
 		return $object->getNomUrl($withpicto);
@@ -241,8 +239,8 @@ class TRhum extends TObjetStd
 
 /**
  * Class needed if link exists with dolibarr object from element_element and call from $form->showLinkedObjectBlock()
- */
-class Rhum extends TRhum
+ 
+class Rhum extends TRhumerie
 {
 	private $PDOdb;
 	
@@ -257,16 +255,21 @@ class Rhum extends TRhum
 	{
 		return $this->load($this->PDOdb, $id);
 	}
-}
+}*/
 
-/*
-class TRhumChild extends TObjetStd
+
+class TRhum extends TObjetStd
 {
 	public function __construct()
 	{
-		$this->set_table(MAIN_DB_PREFIX.'rhum_child');
+		$this->set_table(MAIN_DB_PREFIX.'rhum');
 		
-		$this->add_champs('fk_rhum', array('type' => 'integer', 'index' => true));
+		$this->add_champs('ref', array('type' => 'string', 'length' => 80, 'index' => true));
+		$this->add_champs('label', array('type' => 'string'));
+		$this->add_champs('prix', array('type' => 'integer'));
+		$this->add_champs('fk_rhumerie', array('type' => 'integer', 'index' => true));
+		
+		
 //		$this->add_champs('fk_user', array('type' => 'integer', 'index' => true)); // link n_n with user for example
 		
 		$this->_init_vars();
@@ -290,4 +293,4 @@ class TRhumChild extends TObjetStd
 	}
 	
 }
-*/
+

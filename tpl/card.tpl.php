@@ -16,6 +16,12 @@
 				<td width="25%">[langs.transnoentities(Status)]</td>
 				<td>[object.getLibStatut(1);strconv=no]</td>
 			</tr>
+			
+			<tr class="societe">
+				<td width="25%">Société</td>
+				<td>[view.showFk_soc;strconv=no]</td>
+			</tr>
+			
 		</tbody>
 	</table>
 

@@ -57,7 +57,7 @@ class modRhum extends DolibarrModules
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
-		$this->description = "Description of module Rhum";
+		$this->description = "Module permettant de gérer des rhumeries";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
 		$this->version = '1.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
@@ -137,7 +137,7 @@ class modRhum extends DolibarrModules
 		// 'stock'            to add a tab in stock view
 		// 'thirdparty'       to add a tab in third party view
 		// 'user'             to add a tab in user view
-        $this->tabs = array();
+		$this->tabs = array();
 
         // Dictionaries
 	    if (! isset($conf->rhum->enabled))
@@ -180,7 +180,7 @@ class modRhum extends DolibarrModules
 		// $this->rights[$r][4] = 'level1';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		// $this->rights[$r][5] = 'level2';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		// $r++;
-/*
+
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
 		$this->rights[$r][1] = 'rhum_read';	// Permission label
 		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
@@ -194,7 +194,7 @@ class modRhum extends DolibarrModules
 		$this->rights[$r][4] = 'write';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
-*/
+
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
@@ -203,34 +203,34 @@ class modRhum extends DolibarrModules
 		// Add here entries to declare new menus
 		//
 		// Example to declare a new Top Menu entry and its Left menu entry:
-		// $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum',		// Put 0 if this is a single top menu or keep fk_mainmenu to give an entry on left
-		//							'type'=>'top',			                // This is a Top menu entry
-		//							'titre'=>'Rhum top menu',
-		//							'mainmenu'=>'rhum',
-		//							'leftmenu'=>'rhum_left',			// This is the name of left menu for the next entries
-		//							'url'=>'/rhum/pagetop.php',
-		//							'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-		//							'position'=>100,
-		//							'enabled'=>'$conf->rhum->enabled',	// Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled.
-		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
-		//							'target'=>'',
-		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
-		// $r++;
-		//
+		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum',		// Put 0 if this is a single top menu or keep fk_mainmenu to give an entry on left
+									'type'=>'top',			                // This is a Top menu entry
+									'titre'=>'Rhumeries',
+									'mainmenu'=>'rhum',
+									'leftmenu'=>'rhum_left',			// This is the name of left menu for the next entries
+									'url'=>'/rhum/list.php',
+									'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+									'position'=>100,
+									'enabled'=>'$conf->rhum->enabled',	// Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled.
+									'perms'=>'1',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
+									'target'=>'',
+									'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+		 $r++;
+		
 		// Example to declare a Left Menu entry into an existing Top menu entry:
-		// $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-		//							'type'=>'left',			                // This is a Left menu entry
-		//							'titre'=>'Rhum left menu',
-		//							'mainmenu'=>'rhum',
-		//							'leftmenu'=>'rhum_left',			// Goes into left menu previously created by the mainmenu
-		//							'url'=>'/rhum/pagelevel2.php',
-		//							'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-		//							'position'=>100,
-		//							'enabled'=>'$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
-		//							'target'=>'',
-		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
-		// $r++;
+		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+									'type'=>'left',			                // This is a Left menu entry
+									'titre'=>'Infos Rhumeries',
+									'mainmenu'=>'rhum',
+									'leftmenu'=>'rhum_left',			// Goes into left menu previously created by the mainmenu
+									'url'=>'/rhum/card.php',
+									'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+									'position'=>100,
+									'enabled'=>'$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+									'perms'=>'1',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
+									'target'=>'',
+									'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+		 $r++;
 		
 /*
 		$this->menu[$r]=array(	

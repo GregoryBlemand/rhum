@@ -9,7 +9,7 @@ $langs->load('abricot@abricot');
 $langs->load('rhum@rhum');
 
 $PDOdb = new TPDOdb;
-$object = new TRhum;
+$object = new TRhumerie;
 
 $hookmanager->initHooks(array('rhumlist'));
 
@@ -31,7 +31,7 @@ if (empty($reshook))
  * View
  */
 
-llxHeader('',$langs->trans('RhumList'),'','');
+llxHeader('',$langs->trans('RhumerieList'),'','');
 
 //$type = GETPOST('type');
 //if (empty($user->rights->rhum->all->read)) $type = 'mine';
@@ -39,7 +39,7 @@ llxHeader('',$langs->trans('RhumList'),'','');
 // TODO ajouter les champs de son objet que l'on souhaite afficher
 $sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, \'\' AS action';
 
-$sql.= ' FROM '.MAIN_DB_PREFIX.'rhum t ';
+$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
 
 $sql.= ' WHERE 1=1';
 //$sql.= ' AND t.entity IN ('.getEntity('Rhum', 1).')';
@@ -67,14 +67,16 @@ echo $r->render($PDOdb, $sql, array(
 		,'date_maj' => array('recherche' => 'calendars', 'allow_is_null' => false)
 		,'ref' => array('recherche' => true, 'table' => 't', 'field' => 'ref')
 		,'label' => array('recherche' => true, 'table' => array('t', 't'), 'field' => array('label', 'description')) // input text de recherche sur plusieurs champs
-		,'status' => array('recherche' => TRhum::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
+		,'status' => array('recherche' => TRhumerie::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
+		,'adresse' => array('recherche' => true, 'table' => 't', 'field' => 'adresse')
+		,'societe' => array('recherche' => true, 'table' => 't', 'field' => 'fk_society_assoc')
 	)
 	,'translate' => array()
 	,'hide' => array(
 		'rowid'
 	)
 	,'liste' => array(
-		'titre' => $langs->trans('RhumList')
+		'titre' => $langs->trans('RhumerieList')
 		,'image' => img_picto('','title_generic.png', '', 0)
 		,'picto_precedent' => '<'
 		,'picto_suivant' => '>'
@@ -96,9 +98,8 @@ echo $r->render($PDOdb, $sql, array(
 $parameters=array('sql'=>$sql);
 $reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-
+echo "<a href=\"card.php?mode=edit&action=create\"> Nouvelle Rhumerie </a>";
 $formcore->end_form();
-
 llxFooter('');
 
 /**
