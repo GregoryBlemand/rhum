@@ -70,7 +70,7 @@ function rhum_prepare_head(TRhumerie $object)
     $head[$h][2] = 'card';
     $h++;
 	
-    $head[$h][0] = dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId().'&tab=rhum';
+    $head[$h][0] = dol_buildpath('/rhum/list-rhum.php', 1).'?fk_rhumerie='.$object->getId();
     $head[$h][1] = $langs->trans("Rhums");
     $head[$h][2] = 'rhum';
     $h++;

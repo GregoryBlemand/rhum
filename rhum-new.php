@@ -20,7 +20,7 @@ if (empty($user->rights->rhum->write)) $mode = 'view'; // Force 'view' mode if c
 else if ($action == 'create' || $action == 'edit') $mode = 'edit';
 
 $PDOdb = new TPDOdb;
-$object = new TRhumerie;
+$object = new TRhum;
 
 if (!empty($id)) $object->load($PDOdb, $id);
 elseif (!empty($ref)) $object->loadBy($PDOdb, $ref, 'ref');
@@ -102,14 +102,13 @@ if (empty($reshook))
 
 
 
-function _card(TRhumerie &$object, $action, $mode) {
+function _card(&$object, $action, $mode) {
 
 	global $conf, $db, $user, $langs, $id, $socid;
 	
 	/**
 	 * View
 	 */
-	
 	
 	$title=$langs->trans("Rhumerie");
 	llxHeader('',$title);
@@ -132,7 +131,10 @@ function _card(TRhumerie &$object, $action, $mode) {
 	$form = new Form($db);
 	
 	$thirdparty_static = new Societe($db);
-	$thirdparty_static->fetch($object->fk_soc);	
+	$thirdparty_static->fetch($object->fk_soc);
+	
+	$rhumerie = new TRhumerie;
+	$rhumerie->load($db, )
 	
 	$formconfirm = getFormConfirm($PDOdb, $form, $object, $action);
 	if (!empty($formconfirm)) echo $formconfirm;
@@ -144,7 +146,7 @@ function _card(TRhumerie &$object, $action, $mode) {
 	if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_rhum');
 	
 	$linkback = '<a href="'.dol_buildpath('/rhum/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
-	print $TBS->render('tpl/card.tpl.php'
+	print $TBS->render('tpl/card-rhum.tpl.php'
 		,array() // Block
 		,array(
 			'object'=>$object
@@ -155,19 +157,12 @@ function _card(TRhumerie &$object, $action, $mode) {
 				,'urllist' => dol_buildpath('/rhum/list.php', 1)
 				,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object->generic, 'ref', $linkback, 1, 'ref', 'ref', '')
 				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
-				,'showFk_soc' => $mode == "view" ? $thirdparty_static->getNomUrl(1) : $form->select_company($object->fk_soc,'fk_soc','',1)
-	//			,'showAdresse' => $formcore->zonetexte('', 'adresse', $object->adresse, 80, 8)
-				,'showStatus' => $object->getLibStatut(1)
+				,'showFk_rhumerie' => $mode == "view" ? $thirdparty_static->getNomUrl(1) : $form->select_company($object->fk_soc,'socid','',1)
 			)
 			,'langs' => $langs
 			,'user' => $user
 			,'conf' => $conf
-			,'TRhum' => array(
-				'STATUS_DRAFT' => TRhumerie::STATUS_DRAFT
-				,'STATUS_VALIDATED' => TRhumerie::STATUS_VALIDATED
-				,'STATUS_REFUSED' => TRhumerie::STATUS_REFUSED
-				,'STATUS_ACCEPTED' => TRhumerie::STATUS_ACCEPTED
-			)
+			
 		)
 	);
 	
