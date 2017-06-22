@@ -59,24 +59,33 @@ class ActionsRhum
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	function doActions($parameters, &$object, &$action, $hookmanager)
+	function formObjectOptions($parameters, &$object, &$action, $hookmanager)
 	{
+		global $db;
 		$error = 0; // Error counter
 		$myvalue = 'test'; // A result value
 
-		print_r($parameters);
-		echo "action: " . $action;
-		print_r($object);
-
-		if (in_array('somecontext', explode(':', $parameters['context'])))
+		if (in_array('thirdpartycard', explode(':', $parameters['context'])))
 		{
-		  // do something only for the context 'somecontext'
+			// do something only for the context 'thirdpartycard'
+			
+			// compter le nombre de brasserie gérées par ce tiers
+			$sql = 'SELECT COUNT(*) AS total';
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
+			$sql.= ' WHERE t.fk_soc = '.$object->id;
+			
+			$res = $db->query($sql);
+			
+			if($res){
+				$obj = $db->fetch_object($res);
+				
+			}
+			
+			echo '<tr><td>Nombre de brasseries gérées</td><td>'.$obj->total.'</td></tr>';
 		}
 
 		if (! $error)
 		{
-			$this->results = array('myreturn' => $myvalue);
-			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		}
 		else

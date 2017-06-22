@@ -113,6 +113,7 @@ class InterfaceRhumtrigger
      */
     public function run_trigger($action, $object, $user, $langs, $conf)
     {
+    	exit;
         // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
         // Users

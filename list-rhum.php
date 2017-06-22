@@ -110,7 +110,7 @@ echo $r->render($PDOdb, $sql, array(
 $parameters=array('sql'=>$sql);
 $reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-echo "<a href=\"rhum-new.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\"> Nouveau Rhum </a>";
+echo "<a href=\"rhum-new.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\" class=\"butAction\"> Nouveau Rhum </a>";
 $formcore->end_form();
 dol_fiche_end();
 llxFooter('');

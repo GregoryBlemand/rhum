@@ -51,10 +51,6 @@
 	
 			<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=edit" class="butAction">[langs.transnoentities(Modify)]</a></div>
 
-			
-			<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=modif" class="butAction">[langs.transnoentities(Reopen)]</a></div>
-			
-		
 		<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=clone" class="butAction">[langs.transnoentities(ToClone)]</a></div>
 		
 		<!-- '-+' est l'équivalent d'un signe '<' (TBS oblige) -->

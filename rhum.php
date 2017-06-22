@@ -84,8 +84,9 @@ if (empty($reshook))
 			exit;
 			break;
 		case 'confirm_delete':
+			$fk_rhumerie = $object->fk_rhumerie;
 			if (!empty($user->rights->rhum->write)) $object->delete($PDOdb);
-			header('Location: '.dol_buildpath('/rhum/list.php', 1));
+			header('Location: '.dol_buildpath('/rhum/list-rhum.php', 1).'?fk_rhumerie='.$fk_rhumerie);
 			exit;
 			break;
 		// link from llx_element_element
@@ -110,7 +111,8 @@ function _card(&$PDOdb, &$object, $action, $mode) {
 	 * View
 	 */
 	
-	$fk_rhumerie = GETPOST('fk_rhumerie') || $object->fk_rhumerie;
+	$fk_rhumerie = GETPOST('fk_rhumerie');
+	if($fk_rhumerie == null) $fk_rhumerie = $object->fk_rhumerie;
 	$rhumerie = new TRhumerie;
 	$rhumerie->load($PDOdb, $fk_rhumerie);
 	

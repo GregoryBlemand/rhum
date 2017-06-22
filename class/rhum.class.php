@@ -198,7 +198,7 @@ class TRhumerie extends TObjetStd
         if ($withpicto) $result.=($link.img_object($label, $picto, 'class="classfortooltip"').$linkend);
         if ($withpicto && $withpicto != 2) $result.=' ';
 		
-        $result.=$link.$this->ref.$linkend;
+        $result.=$link.$this->label.$linkend;
 		
         return $result;
 	}
@@ -269,7 +269,7 @@ class TRhum extends TObjetStd
 		
 		$this->add_champs('ref', array('type' => 'string', 'length' => 80, 'index' => true));
 		$this->add_champs('label', array('type' => 'string'));
-		$this->add_champs('prix', array('type' => 'integer'));
+		$this->add_champs('prix', array('type' => 'float'));
 		$this->add_champs('fk_rhumerie', array('type' => 'integer', 'index' => true));
 		
 		

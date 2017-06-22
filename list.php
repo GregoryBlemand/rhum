@@ -52,7 +52,7 @@ if($fk_soc>0) {
 //if (empty($user->rights->rhum->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, \'\' AS action';
+$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
 
@@ -87,9 +87,6 @@ echo $r->render($PDOdb, $sql, array(
 		,'date_maj' => array('recherche' => 'calendars', 'allow_is_null' => false)
 		,'ref' => array('recherche' => true, 'table' => 't', 'field' => 'ref')
 		,'label' => array('recherche' => true, 'table' => array('t', 't'), 'field' => array('label', 'description')) // input text de recherche sur plusieurs champs
-		,'status' => array('recherche' => TRhumerie::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
-		,'adresse' => array('recherche' => true, 'table' => 't', 'field' => 'adresse')
-		,'societe' => array('recherche' => true, 'table' => 't', 'field' => 'fk_society_assoc')
 	)
 	,'translate' => array()
 	,'hide' => array(
@@ -118,7 +115,7 @@ echo $r->render($PDOdb, $sql, array(
 $parameters=array('sql'=>$sql);
 $reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-echo "<a href=\"card.php?mode=edit&action=create\"> Nouvelle Rhumerie </a>";
+echo "<a href=\"card.php?mode=edit&action=create\" class=\"butAction\"> Nouvelle Rhumerie </a>";
 $formcore->end_form();
 
 if($fk_soc>0) {
