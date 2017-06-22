@@ -77,8 +77,7 @@ class ActionsRhum
 			$res = $db->query($sql);
 			
 			if($res){
-				$obj = $db->fetch_object($res);
-				
+				$obj = $db->fetch_object($res);	
 			}
 			
 			echo '<tr><td>Nombre de brasseries gérées</td><td>'.$obj->total.'</td></tr>';

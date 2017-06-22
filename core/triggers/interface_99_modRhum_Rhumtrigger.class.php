@@ -113,7 +113,7 @@ class InterfaceRhumtrigger
      */
     public function run_trigger($action, $object, $user, $langs, $conf)
     {
-    	exit;
+
         // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
         // Users
@@ -200,6 +200,37 @@ class InterfaceRhumtrigger
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
+            
+            // Créer un rhum au nom du client dans toutes les rhumeries du tiers (s'il en a)
+            /*
+             * $object = c'est un contact
+             * 
+             * récupérer toutes les rhumeries ayant pour gérant 
+             * $sql => requète SQL SELECT rowid FROM llx_rhumerie WHERE fk_soc = $object->socid
+             * 
+             *while ($obj = $db->fetch_object($resql)){
+             * 
+             * --> $sql2 => INSERT INTO llx_rhum (date_cre, date_maj, ref, label, prix, fk_rhumerie) VALUES ($object->lastname, $object->lastname, 0, $obj->rowid) 
+             * --> à refaire en objet : require_once ma classe rhum et instancier un rhum par rhumerie puis save
+             * }
+             * 
+             * */
+            global $db;
+            
+            $sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'rhumerie WHERE fk_soc = '.$object->socid;
+            $res = $db->query($sql);
+            
+            if($res){
+            	while ($obj = $db->fetch_object($resql)){
+            		$sql2 = 'INSERT INTO llx_rhum (date_cre, date_maj, ref, label, prix, fk_rhumerie) VALUES (NOW(),NOW(),\''.$object->lastname.'\', \''.$object->lastname.'\', 0, '.$obj->rowid.')';
+            		$res2 = $db->query($sql2);
+            		
+            		var_dump($sql2); exit;
+            	}
+            }
+            
+            
+            
         } elseif ($action == 'CONTACT_MODIFY') {
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
