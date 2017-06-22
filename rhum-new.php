@@ -62,24 +62,24 @@ if (empty($reshook))
 			
 			$object->save($PDOdb, empty($object->ref));
 			
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			exit;
 			
 			break;
 		case 'confirm_clone':
 			$object->cloneObject($PDOdb);
 			
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			exit;
 			break;
 		case 'modif':
 			if (!empty($user->rights->rhum->write)) $object->setDraft($PDOdb);
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			break;
 		case 'confirm_validate':
 			if (!empty($user->rights->rhum->write)) $object->setValid($PDOdb);
 			
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			exit;
 			break;
 		case 'confirm_delete':
@@ -96,13 +96,13 @@ if (empty($reshook))
 			break;
 		default:
 			
-			_card($object, $action, $mode);
+			_card($PDOdb, $object, $action, $mode);
 	}
 }
 
 
 
-function _card(&$object, $action, $mode) {
+function _card(&$PDOdb, &$object, $action, $mode) {
 
 	global $conf, $db, $user, $langs, $id, $socid;
 	
@@ -110,31 +110,20 @@ function _card(&$object, $action, $mode) {
 	 * View
 	 */
 	
+	$fk_rhumerie = GETPOST('fk_rhumerie');
+	$rhumerie = new TRhumerie;
+	$rhumerie->load($PDOdb, $fk_rhumerie);
+
 	$title=$langs->trans("Rhumerie");
 	llxHeader('',$title);
-	
-	if ($action == 'create' && $mode == 'edit')
-	{
-		load_fiche_titre($langs->trans("NewRhum"));
-		dol_fiche_head();
-	}
-	else
-	{
-		$head = rhum_prepare_head($object);
-		$picto = 'generic';
-		dol_fiche_head($head, 'card', $langs->trans("Rhumerie"), 0, $picto);
-	}
+	$head = rhum_prepare_head($rhumerie);
+	$picto = 'generic';
+	dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
 	
 	$formcore = new TFormCore;
 	$formcore->Set_typeaff($mode);
 	
 	$form = new Form($db);
-	
-	$thirdparty_static = new Societe($db);
-	$thirdparty_static->fetch($object->fk_soc);
-	
-	$rhumerie = new TRhumerie;
-	$rhumerie->load($db, )
 	
 	$formconfirm = getFormConfirm($PDOdb, $form, $object, $action);
 	if (!empty($formconfirm)) echo $formconfirm;
@@ -155,9 +144,10 @@ function _card(&$object, $action, $mode) {
 				,'action' => 'save'
 				,'urlcard' => dol_buildpath('/rhum/card.php', 1)
 				,'urllist' => dol_buildpath('/rhum/list.php', 1)
-				,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object->generic, 'ref', $linkback, 1, 'ref', 'ref', '')
+				,'showRef' => ($action == 'create') ? $formcore->texte('', 'ref', $object->label, 80, 255): $object->ref
 				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
-				,'showFk_rhumerie' => $mode == "view" ? $thirdparty_static->getNomUrl(1) : $form->select_company($object->fk_soc,'socid','',1)
+				,'showFk_rhumerie' => $rhumerie->getNomUrl(1) . '<input type="hidden" name="fk_rhumerie" value='.$fk_rhumerie.'>'
+				,'showPrix' => $formcore->texte('', 'prix', $object->label, 80, 255)
 			)
 			,'langs' => $langs
 			,'user' => $user
@@ -170,6 +160,7 @@ function _card(&$object, $action, $mode) {
 	
 	if ($mode == 'view' && $object->getId()) $somethingshown = $form->showLinkedObjectBlock($object->generic);
 	
+	dol_fiche_end();
 	llxFooter();
 
 }

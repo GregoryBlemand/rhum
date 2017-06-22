@@ -48,11 +48,13 @@ dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
 //if (empty($user->rights->rhum->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, \'\' AS action';
+$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, t.prix, \'\' AS action';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'rhum t ';
 
 $sql.= ' WHERE 1=1';
+
+$sql.= ' AND fk_rhumerie = '.$fk_rhumerie;
 //$sql.= ' AND t.entity IN ('.getEntity('Rhum', 1).')';
 //if ($type == 'mine') $sql.= ' AND t.fk_user = '.$user->id;
 
@@ -69,7 +71,7 @@ echo $r->render($PDOdb, $sql, array(
 	)
 	,'subQuery' => array()
 	,'link' => array(
-			'label'=>'<a href="card.php?id=@rowid@">@val@</a>'
+			'label'=>'<a href="rhum.php?id=@rowid@">@val@</a>'
 	)
 	,'type' => array(
 		'date_cre' => 'date' // [datetime], [hour], [money], [number], [integer]
@@ -79,6 +81,7 @@ echo $r->render($PDOdb, $sql, array(
 		'date_cre' => array('recherche' => 'calendars', 'allow_is_null' => true)
 		,'date_maj' => array('recherche' => 'calendars', 'allow_is_null' => false)
 		,'label' => array('recherche' => true, 'table' => array('t', 't'), 'field' => array('label', 'description')) // input text de recherche sur plusieurs champs
+		,'prix' => array('recherche' => true, 'table' => array('t', 't'), 'field' => array('prix'))
 	)
 	,'translate' => array()
 	,'hide' => array(
@@ -107,7 +110,7 @@ echo $r->render($PDOdb, $sql, array(
 $parameters=array('sql'=>$sql);
 $reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-echo "<a href=\"rhum-new.php?mode=edit&action=create&id=".$object->getId()."\"> Nouveau Rhum </a>";
+echo "<a href=\"rhum-new.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\"> Nouveau Rhum </a>";
 $formcore->end_form();
 dol_fiche_end();
 llxFooter('');

@@ -14,6 +14,7 @@ $action = GETPOST('action');
 $socid = GETPOST('socid', 'int');
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref');
+$fk_rhumerie = GETPOST('fk_rhumerie');
 
 $mode = 'view';
 if (empty($user->rights->rhum->write)) $mode = 'view'; // Force 'view' mode if can't edit object
@@ -62,29 +63,28 @@ if (empty($reshook))
 			
 			$object->save($PDOdb, empty($object->ref));
 			
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			exit;
 			
 			break;
 		case 'confirm_clone':
 			$object->cloneObject($PDOdb);
 			
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			exit;
 			break;
 		case 'modif':
 			if (!empty($user->rights->rhum->write)) $object->setDraft($PDOdb);
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			break;
 		case 'confirm_validate':
 			if (!empty($user->rights->rhum->write)) $object->setValid($PDOdb);
 			
-			header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
 			exit;
 			break;
 		case 'confirm_delete':
 			if (!empty($user->rights->rhum->write)) $object->delete($PDOdb);
-			
 			header('Location: '.dol_buildpath('/rhum/list.php', 1));
 			exit;
 			break;
@@ -96,13 +96,13 @@ if (empty($reshook))
 			break;
 		default:
 			
-			_card($object, $action, $mode);
+			_card($PDOdb, $object, $action, $mode);
 	}
 }
 
 
 
-function _card(&$object, $action, $mode) {
+function _card(&$PDOdb, &$object, $action, $mode) {
 
 	global $conf, $db, $user, $langs, $id, $socid;
 	
@@ -110,28 +110,20 @@ function _card(&$object, $action, $mode) {
 	 * View
 	 */
 	
+	$fk_rhumerie = GETPOST('fk_rhumerie') || $object->fk_rhumerie;
+	$rhumerie = new TRhumerie;
+	$rhumerie->load($PDOdb, $fk_rhumerie);
+	
 	$title=$langs->trans("Rhumerie");
 	llxHeader('',$title);
-	
-	if ($action == 'create' && $mode == 'edit')
-	{
-		load_fiche_titre($langs->trans("NewRhum"));
-		dol_fiche_head();
-	}
-	else
-	{
-		$head = rhum_prepare_head($object);
-		$picto = 'generic';
-		dol_fiche_head($head, 'card', $langs->trans("Rhumerie"), 0, $picto);
-	}
+	$head = rhum_prepare_head($rhumerie);
+	$picto = 'generic';
+	dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
 	
 	$formcore = new TFormCore;
 	$formcore->Set_typeaff($mode);
 	
 	$form = new Form($db);
-	
-	$thirdparty_static = new Societe($db);
-	$thirdparty_static->fetch($object->fk_soc);	
 	
 	$formconfirm = getFormConfirm($PDOdb, $form, $object, $action);
 	if (!empty($formconfirm)) echo $formconfirm;
@@ -143,7 +135,7 @@ function _card(&$object, $action, $mode) {
 	if ($mode == 'edit') echo $formcore->begin_form($_SERVER['PHP_SELF'], 'form_rhum');
 	
 	$linkback = '<a href="'.dol_buildpath('/rhum/list.php', 1).'">' . $langs->trans("BackToList") . '</a>';
-	print $TBS->render('tpl/card.tpl.php'
+	print $TBS->render('tpl/card-rhum.tpl.php'
 		,array() // Block
 		,array(
 			'object'=>$object
@@ -152,11 +144,10 @@ function _card(&$object, $action, $mode) {
 				,'action' => 'save'
 				,'urlcard' => dol_buildpath('/rhum/card.php', 1)
 				,'urllist' => dol_buildpath('/rhum/list.php', 1)
-				,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $form->showrefnav($object->generic, 'ref', $linkback, 1, 'ref', 'ref', '')
+				,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $formcore->texte('', 'ref', $object->ref, 80, 255)
 				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
-				,'showFk_soc' => $mode == "view" ? $thirdparty_static->getNomUrl(1) : $form->select_company($object->fk_soc,'socid','',1)
-	//			,'showAdresse' => $formcore->zonetexte('', 'adresse', $object->adresse, 80, 8)
-				,'showStatus' => $object->getLibStatut(1)
+				,'showFk_rhumerie' => $rhumerie->getNomUrl(1) . '<input type="hidden" name="fk_rhumerie" value='.$fk_rhumerie.'>'
+				,'showPrix' => $formcore->texte('', 'prix', $object->prix, 80, 255)
 			)
 			,'langs' => $langs
 			,'user' => $user
@@ -166,8 +157,6 @@ function _card(&$object, $action, $mode) {
 	);
 	
 	if ($mode == 'edit') echo $formcore->end_form();
-	
-	if ($mode == 'view' && $object->getId()) $somethingshown = $form->showLinkedObjectBlock($object->generic);
 	
 	llxFooter();
 

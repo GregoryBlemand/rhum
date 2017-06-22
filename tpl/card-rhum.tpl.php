@@ -13,8 +13,13 @@
 			</tr>
 			
 			<tr class="fk_rhumerie">
-				<td width="25%">[langs.transnoentities(Company)]</td>
+				<td width="25%">Rhumerie</td>
 				<td>[view.showFk_rhumerie;strconv=no]</td>
+			</tr>
+			
+			<tr class="prix">
+				<td width="25%">Prix</td>
+				<td>[view.showPrix;strconv=no]</td>
 			</tr>
 			
 		</tbody>
@@ -43,9 +48,20 @@
 [onshow;block=begin;when [view.mode]!='edit']
 <div class="tabsAction">
 	[onshow;block=begin;when [user.rights.rhum.write;noerr]=1]
+	
+			<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=edit" class="butAction">[langs.transnoentities(Modify)]</a></div>
+
+			
+			<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=modif" class="butAction">[langs.transnoentities(Reopen)]</a></div>
+			
 		
-		<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.getId()]&action=clone" class="butAction">[langs.transnoentities(ToClone)]</a></div>
+		<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=clone" class="butAction">[langs.transnoentities(ToClone)]</a></div>
 		
+		<!-- '-+' est l'équivalent d'un signe '<' (TBS oblige) -->
+			
+			<div class="inline-block divButAction"><a href="rhum.php?id=[object.getId()]&action=delete" class="butActionDelete">[langs.transnoentities(Delete)]</a></div>
+			
+
 	[onshow;block=end]
 </div>
 [onshow;block=end]

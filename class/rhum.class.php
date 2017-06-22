@@ -278,6 +278,11 @@ class TRhum extends TObjetStd
 		$this->_init_vars();
 		$this->start();
 		
+		if (!class_exists('GenericObject')) require_once DOL_DOCUMENT_ROOT.'/core/class/genericobject.class.php';
+		$this->generic = new GenericObject($db);
+		$this->generic->table_element = $this->get_table();
+		$this->generic->element = 'rhum';
+		
 		$this->user = null;
 	}
 	

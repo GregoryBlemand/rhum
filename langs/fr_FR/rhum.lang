@@ -43,3 +43,7 @@ ToClone=Cloner
 Delete=Supprimer
 
 ConfirmValidateRhum=Valider la rhumerie ?
+ConfirmCloneRhum=Cloner ce rhum ?
+CloneRhum=Cloner ?
+ConfirmDeleteRhum=Etes-vous sur de vouloir supprimer ?
+DeleteRhum=Supprimer ?
