@@ -112,7 +112,7 @@ function _card(&$PDOdb, &$object, $action, $mode) {
 	 */
 	
 	$fk_rhumerie = GETPOST('fk_rhumerie');
-	if($fk_rhumerie == null) $fk_rhumerie = $object->fk_rhumerie;
+	if(empty($fk_rhumerie)) $fk_rhumerie = $object->fk_rhumerie;
 	$rhumerie = new TRhumerie;
 	$rhumerie->load($PDOdb, $fk_rhumerie);
 	
