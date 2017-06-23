@@ -30,6 +30,7 @@
  * 				- The name property name must be Mytrigger
  */
 
+
 /**
  * Trigger class
  */
@@ -113,7 +114,8 @@ class InterfaceRhumtrigger
      */
     public function run_trigger($action, $object, $user, $langs, $conf)
     {
-
+    	define('INC_FROM_DOLIBARR', true);
+    	dol_include_once('/rhum/config.php');
         // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
         // Users
@@ -209,8 +211,7 @@ class InterfaceRhumtrigger
              * $sql => requète SQL SELECT rowid FROM llx_rhumerie WHERE fk_soc = $object->socid
              * 
              *while ($obj = $db->fetch_object($resql)){
-             * 
-             * --> $sql2 => INSERT INTO llx_rhum (date_cre, date_maj, ref, label, prix, fk_rhumerie) VALUES ($object->lastname, $object->lastname, 0, $obj->rowid) 
+             *  
              * --> à refaire en objet : require_once ma classe rhum et instancier un rhum par rhumerie puis save
              * }
              * 
@@ -218,14 +219,22 @@ class InterfaceRhumtrigger
             global $db;
             
             $sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'rhumerie WHERE fk_soc = '.$object->socid;
-            $res = $db->query($sql);
+            $res = $this->db->query($sql);
             
             if($res){
             	while ($obj = $db->fetch_object($resql)){
-            		$sql2 = 'INSERT INTO llx_rhum (date_cre, date_maj, ref, label, prix, fk_rhumerie) VALUES (NOW(),NOW(),\''.$object->lastname.'\', \''.$object->lastname.'\', 0, '.$obj->rowid.')';
-            		$res2 = $db->query($sql2);
+            		            		
+            		$PDOdb = new TPDOdb;
             		
-            		var_dump($sql2); exit;
+            		dol_include_once('/rhum/class/rhum.class.php');
+            		
+            		$rhum = new TRhum;
+            		$rhum->ref = $object->lastname;
+            		$rhum->label = $object->lastname;
+            		$rhum->prix = 2;
+            		$rhum->fk_rhumerie = $object->socid;
+            		
+            		$rhum->save($PDOdb);
             	}
             }
             
