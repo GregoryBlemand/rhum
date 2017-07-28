@@ -144,7 +144,7 @@ function _card(&$PDOdb, &$object, $action, $mode) {
 				,'action' => 'save'
 				,'urlcard' => dol_buildpath('/rhum/card.php', 1)
 				,'urllist' => dol_buildpath('/rhum/list.php', 1)
-				,'showRef' => ($action == 'create') ? $formcore->texte('', 'ref', $object->label, 80, 255): $object->ref
+				,'showRef' => ($action == 'create') ? $formcore->texte('', 'ref', $object->label, 80, 255) : $object->ref
 				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
 				,'showFk_rhumerie' => $rhumerie->getNomUrl(1) . '<input type="hidden" name="fk_rhumerie" value='.$fk_rhumerie.'>'
 				,'showPrix' => $formcore->texte('', 'prix', $object->label, 80, 255)

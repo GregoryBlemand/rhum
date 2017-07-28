@@ -4,7 +4,15 @@ require 'config.php';
 dol_include_once('/rhum/class/rhum.class.php');
 dol_include_once('/rhum/lib/rhum.lib.php');
 
-if(empty($user->rights->rhum->read)) accessforbidden();
+//je vire ce accessforbidden() parce que un peu moche... quand on te parle en anglais c'est mauvais signe
+//if(empty($user->rights->rhum->read)) accessforbidden();
+
+// vérifie les droits en lecture
+if(empty($user->rights->rhum->read)){
+	setEventMessages('Vous n\'avez pas les droits pour accéder au module rhumerie !', null, 'errors');
+	header('Location: '.dol_buildpath('/', 1));
+	exit;
+}
 
 $langs->load('abricot@abricot');
 $langs->load('rhum@rhum');
@@ -40,7 +48,7 @@ if (empty($reshook))
  * View
  */
 
-llxHeader('',$langs->trans('RhumerieList'),'','');
+llxHeader('',$langs->trans('RhumsList'),'','');
 $head = rhum_prepare_head($object);
 $picto = 'generic';
 dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
@@ -48,7 +56,7 @@ dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
 //if (empty($user->rights->rhum->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, t.prix, \'\' AS action';
+$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, t.prix, t.fk_rhumerie';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'rhum t ';
 
@@ -86,9 +94,10 @@ echo $r->render($PDOdb, $sql, array(
 	,'translate' => array()
 	,'hide' => array(
 		'rowid'
+		,'fk_rhumerie'
 	)
 	,'liste' => array(
-		'titre' => $langs->trans('RhumerieList')
+		'titre' => $langs->trans('RhumsList')
 		,'image' => img_picto('','title_generic.png', '', 0)
 		,'picto_precedent' => '<'
 		,'picto_suivant' => '>'
@@ -110,7 +119,7 @@ echo $r->render($PDOdb, $sql, array(
 $parameters=array('sql'=>$sql);
 $reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-echo "<a href=\"rhum-new.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\" class=\"butAction\"> Nouveau Rhum </a>";
+print "<div class=\"tabsAction\"><a href=\"rhum.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\" class=\"butAction\"> Nouveau Rhum </a></div>";
 $formcore->end_form();
 dol_fiche_end();
 llxFooter('');

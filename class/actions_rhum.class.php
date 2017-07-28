@@ -82,6 +82,62 @@ class ActionsRhum
 			
 			echo '<tr><td>Nombre de brasseries gérées</td><td>'.$obj->total.'</td></tr>';
 		}
+		
+		
+		if (in_array('productcard', explode(':', $parameters['context'])))
+		{
+			?>
+			<script type="text/javascript">
+				// ajoute la "nature" rhum au select nature pour pouvoir jouer avec durant la commande
+				$(document).ready(function(){
+					if($('#finished').lenght > 0){
+						$('#finished').append('<option value=\"2\">Rhum</option>');
+					}
+				});
+			</script>
+			
+			
+			
+			<?php 
+		}
+		
+		if (in_array('ordercard', explode(':', $parameters['context'])))
+		{
+			global $db;
+			
+			// récupérer la liste des rhumeries à afficher
+			$sql = 'SELECT t.rowid, t.label';
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
+			$sql.= ' WHERE 1';
+			
+			$res = $db->query($sql);
+			
+			if($res){
+				$select = '<select name="rhumerie" id="rhumerie">';
+				$select .= '<option value="0" selected></option>';
+				
+				while($obj = $db->fetch_object($res)){
+					$select .= '<option value="' . $obj->rowid . '">' . $obj->label . '</option>';
+				}
+		
+				$select .= '</select>';
+			}
+			
+			?>
+			<script type="text/javascript">
+			$(document).ready(function(){
+				$('#idprod').on('change', function(){
+					console.log($(this).val());
+					if($('#rhumerie').length == 0){
+						$('span.prod_entry_mode_predef').append('<label for="rhumerie"> Rhumerie : </label><?php print $select ?>');
+					}
+				});
+			});
+			</script>
+			
+			
+			<?php
+		}
 
 		if (! $error)
 		{

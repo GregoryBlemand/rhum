@@ -1,5 +1,7 @@
 <?php
 
+// Ceci est la card qui sert pour les rhums dans les rhumeries...
+
 require 'config.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
@@ -28,6 +30,29 @@ elseif (!empty($ref)) $object->loadBy($PDOdb, $ref, 'ref');
 
 $hookmanager->initHooks(array('rhumcard', 'globalcard'));
 
+// vérifie les droits en lecture
+if(!$user->rights->rhum->read){
+	setEventMessages('Vous n\'avez pas les droits pour accéder au module rhumerie !', null, 'errors');
+	header('Location: '.dol_buildpath('/', 1));
+	exit;
+}
+
+// vérifie les droits en édition
+$modifArray = ['edit', 'save', 'confirm_clone','modif', 'confirm_validate'];
+
+if(in_array($action, $modifArray) && empty($user->rights->rhum->write)){
+	setEventMessages('Vous n\'avez pas les droits de création/modification !', null, 'errors');
+	header('Location: '.dol_buildpath('/rhum/card.php', 1).'?id='.$object->getId());
+	exit;
+}
+
+// vérifie les droits de suppression
+if($action == 'confirm_delete' && empty($user->rights->rhum->delete)){
+	setEventMessages('Vous n\'avez pas les droits de suppression !', null, 'errors');
+	header('Location: '.dol_buildpath('/', 1));
+	exit;
+}
+
 /*
  * Actions
  */
@@ -42,29 +67,35 @@ if (empty($reshook))
 	$error = 0;
 	switch ($action) {
 		case 'save':
-			$object->set_values($_REQUEST); // Set standard attributes
-			
-//			$object->date_other = dol_mktime(GETPOST('starthour'), GETPOST('startmin'), 0, GETPOST('startmonth'), GETPOST('startday'), GETPOST('startyear'));
-
-			// Check parameters
-//			if (empty($object->date_other))
-//			{
-//				$error++;
-//				setEventMessages($langs->trans('warning_date_must_be_fill'), array(), 'warnings');
-//			}
-			
-			// ... 
-			
-			if ($error > 0)
-			{
-				$mode = 'edit';
-				break;
+			if($user->rights->rhum->write){ // si l'utilisateur à les droits en écriture
+				$object->set_values($_REQUEST); // Set standard attributes
+				
+	//			$object->date_other = dol_mktime(GETPOST('starthour'), GETPOST('startmin'), 0, GETPOST('startmonth'), GETPOST('startday'), GETPOST('startyear'));
+	
+				// Check parameters
+	//			if (empty($object->date_other))
+	//			{
+	//				$error++;
+	//				setEventMessages($langs->trans('warning_date_must_be_fill'), array(), 'warnings');
+	//			}
+				
+				// ... 
+				
+				if ($error > 0)
+				{
+					$mode = 'edit';
+					break;
+				}
+				
+				$object->save($PDOdb, empty($object->ref));
+				
+				header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
+				exit;
+			} else { // sinon je t'affiche la liste
+				setEventMessages('Vous n\'avez pas les droits de création !', null, 'errors');
+				header('Location: '.dol_buildpath('/rhum/list-rhum.php', 1));
+				exit;
 			}
-			
-			$object->save($PDOdb, empty($object->ref));
-			
-			header('Location: '.dol_buildpath('/rhum/rhum.php', 1).'?id='.$object->getId());
-			exit;
 			
 			break;
 		case 'confirm_clone':
@@ -146,10 +177,10 @@ function _card(&$PDOdb, &$object, $action, $mode) {
 				,'action' => 'save'
 				,'urlcard' => dol_buildpath('/rhum/card.php', 1)
 				,'urllist' => dol_buildpath('/rhum/list.php', 1)
-				,'showRef' => ($action == 'create') ? $langs->trans('Draft') : $formcore->texte('', 'ref', $object->ref, 80, 255)
-				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255)
+				,'showRef' => ($action == 'create') ? $formcore->texte('', 'ref', $object->label, 80, 255): $object->ref
+				,'showLabel' => $formcore->texte('', 'label', $object->label, 80, 255, 'required="required"')
 				,'showFk_rhumerie' => $rhumerie->getNomUrl(1) . '<input type="hidden" name="fk_rhumerie" value='.$fk_rhumerie.'>'
-				,'showPrix' => $formcore->texte('', 'prix', $object->prix, 80, 255)
+				,'showPrix' => $formcore->texte('', 'prix', $object->prix, 80, 255, 'required="required"')
 			)
 			,'langs' => $langs
 			,'user' => $user
@@ -160,6 +191,7 @@ function _card(&$PDOdb, &$object, $action, $mode) {
 	
 	if ($mode == 'edit') echo $formcore->end_form();
 	
+	dol_fiche_end();
 	llxFooter();
 
 }
