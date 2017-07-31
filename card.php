@@ -27,13 +27,6 @@ elseif (!empty($ref)) $object->loadBy($PDOdb, $ref, 'ref');
 
 $hookmanager->initHooks(array('rhumcard', 'globalcard'));
 
-// vérifie les droits en lecture
-if(!$user->rights->rhum->read){
-	setEventMessages('Vous n\'avez pas les droits pour accéder au module rhumerie !', null, 'errors');
-	header('Location: '.dol_buildpath('/', 1));
-	exit;
-}
-
 // vérifie les droits en édition
 if($action == 'edit' && !$user->rights->rhum->write){
 	setEventMessages('Vous n\'avez pas les droits de modification !', null, 'errors');
@@ -127,8 +120,7 @@ if (empty($reshook))
 			break;
 		default:
 			if(!$user->rights->rhum->read){
-				setEventMessages('Vous n\'avez pas les droits pour accéder à ce module !', null, 'errors');
-				header('Location: '.dol_buildpath('/', 1));
+				accessforbidden();
 				exit;
 			} else {
 				_card($object, $action, $mode);
@@ -210,7 +202,7 @@ function _card(TRhumerie &$object, $action, $mode) {
 	
 	if ($mode == 'edit' && $user->rights->rhum->write) echo $formcore->end_form();
 	
-	if ($mode == 'view' && $object->getId()) $somethingshown = $form->showLinkedObjectBlock($object->generic);
+	//if ($mode == 'view' && $object->getId()) $somethingshown = $form->showLinkedObjectBlock($object->generic);
 	
 	llxFooter();
 

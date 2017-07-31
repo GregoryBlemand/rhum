@@ -102,7 +102,7 @@ class modRhum extends DolibarrModules
 
 		// Dependencies
 		$this->hidden = false;			// A condition to hide module
-		$this->depends = array();		// List of modules id that must be enabled if this module is enabled
+		$this->depends = array('modProduct', 'modService');		// List of modules id that must be enabled if this module is enabled
 		$this->requiredby = array();	// List of modules id to disable if this one is disabled
 		$this->conflictwith = array();	// List of modules id this module is in conflict with
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
@@ -188,21 +188,21 @@ class modRhum extends DolibarrModules
 		// $r++;
 
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
-		$this->rights[$r][1] = 'rhum_read';	// Permission label
+		$this->rights[$r][1] = 'Accéder au module et consulter les rhumeries';	// Permission label
 		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'read';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 		
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
-		$this->rights[$r][1] = 'rhum_write';	// Permission label
+		$this->rights[$r][1] = 'Créer ou modifier une rhumerie';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'write';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 		
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
-		$this->rights[$r][1] = 'rhum_delete';	// Permission label
+		$this->rights[$r][1] = 'Supprimer une rhumerie';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'delete';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
@@ -225,9 +225,9 @@ class modRhum extends DolibarrModules
 									'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 									'position'=>100,
 									'enabled'=>'$conf->rhum->enabled',	// Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled.
-									'perms'=>'1',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
+									'perms'=>'$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
 									'target'=>'',
-									'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+									'user'=>0);				                // 0=Menu for internal users, 1=external users, 2=both
 		 $r++;
 		
 		// Example to declare a Left Menu entry into an existing Top menu entry:
@@ -242,24 +242,25 @@ class modRhum extends DolibarrModules
 									'enabled'=>'$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 									'perms'=>'$user->rights->rhum->write',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
 									'target'=>'',
-									'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+									'user'=>0);				                // 0=Menu for internal users, 1=external users, 2=both
 		 $r++;
 		
+/*		 
 		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 		 		'type'=>'left',			                // This is a Left menu entry
-		 		'titre'=>'Nouveau Rhum',
+		 		'titre'=>'Liste',
 		 		'mainmenu'=>'rhum',
 		 		'leftmenu'=>'rhum_left',			// Goes into left menu previously created by the mainmenu
-		 		'url'=>'/product/card.php?action=create&type=0',
+		 		'url'=>'/rhum/list.php',
 		 		'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 		 		'position'=>100,
 		 		'enabled'=>'$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		 		'perms'=>'$user->rights->rhum->write',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
+		 		'perms'=>'$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
 		 		'target'=>'',
 		 		'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		 $r++;
 		 
-/*
+
 		$this->menu[$r]=array(	
 			'fk_menu'=>0,			                // Put 0 if this is a top menu
 			'type'=>'top',			                // This is a Top menu entry
@@ -362,6 +363,25 @@ class modRhum extends DolibarrModules
 		dol_include_once('/rhum/script/create-maj-base.php');
 
 		$result=$this->_load_tables('/rhum/sql/');
+		
+		/*
+		require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+		
+		$extrafields = new ExtraFields($db);
+		$res=$extrafields->addExtraField(
+				'rhumerie',
+				'rhumerie',
+				'string',
+				0,
+				255,
+				'commandedet'
+				);
+		if ($res > 0)
+		{
+			setEventMessages($langs->trans('extrafieldCreated'), null, 'mesgs');
+		} else {
+			setEventMessages($langs->trans('extrafieldNotCreated'), null, 'errors');
+		} */
 
 		return $this->_init($sql, $options);
 	}
@@ -377,7 +397,7 @@ class modRhum extends DolibarrModules
 	function remove($options='')
 	{
 		$sql = array();
-
+		
 		return $this->_remove($sql, $options);
 	}
 

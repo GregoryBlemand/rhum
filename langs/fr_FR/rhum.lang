@@ -25,6 +25,8 @@ Accepted=Accepté
 # LIST
 RhumerieList=Liste Rhumeries
 NoRhum=(vide)
+DateCre=Création
+DateMaj=Mise à jour
 
 # CARD
 NewRhum=Création Rhumerie

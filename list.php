@@ -3,15 +3,9 @@
 require 'config.php';
 dol_include_once('/rhum/class/rhum.class.php');
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-//je vire ce accessforbidden() parce que un peu moche... quand on te parle en anglais c'est mauvais signe
-//if(empty($user->rights->rhum->read)) accessforbidden();
 
 // vérifie les droits en lecture
-if(!$user->rights->rhum->read){
-	setEventMessages('Vous n\'avez pas les droits pour accéder au module rhumerie !', null, 'errors');
-	header('Location: '.dol_buildpath('/', 1));
-	exit;
-}
+if(empty($user->rights->rhum->read)) accessforbidden();
 
 $langs->load('abricot@abricot');
 $langs->load('rhum@rhum');
@@ -59,7 +53,7 @@ if($fk_soc>0) {
 //if (empty($user->rights->rhum->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj';
+$sql = 'SELECT t.rowid, t.ref, t.label, t.status, t.date_cre, t.date_maj';
 
 $sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
 
@@ -122,9 +116,7 @@ echo $r->render($PDOdb, $sql, array(
 $parameters=array('sql'=>$sql);
 $reshook=$hookmanager->executeHooks('printFieldListFooter', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
-if ($user->rights->rhum->write){
-	print "<div class=\"tabsAction\"><a href=\"card.php?mode=edit&action=create\" class=\"butAction\"> Nouvelle Rhumerie </a></div>";
-}
+
 $formcore->end_form();
 
 if($fk_soc>0) {
