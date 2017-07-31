@@ -114,7 +114,7 @@ class ActionsRhum
 			
 			if($res){
 				$select = '<select name="rhumerie" id="rhumerie">';
-				$select .= '<option value="0" selected></option>';
+				$select .= '<option value="0"></option>';
 				
 				while($obj = $db->fetch_object($res)){
 					$select .= '<option value="' . $obj->rowid . '">' . $obj->label . '</option>';
@@ -126,11 +126,22 @@ class ActionsRhum
 			?>
 			<script type="text/javascript">
 			$(document).ready(function(){
-				$('#idprod').on('change', function(){
-					console.log($(this).val());
-					if($('#rhumerie').length == 0){
-						$('span.prod_entry_mode_predef').append('<label for="rhumerie"> Rhumerie : </label><?php print $select ?>');
-					}
+				if($('#rhumerie').length == 0){
+					$('input[name="options_rhumerie"]').hide().parent().append('<?php print $select ?>');
+					$('#rhumerie').on('change', function(){
+						// Le champ de l'extrafield prend la valeur du select => l'id de la rhummerie
+						var rhumerie = $('#rhumerie').val();
+						$('input[name="options_rhumerie"]').attr('value', rhumerie);
+					});
+				}
+				if($('input[name="options_rhumerie"]').val() !== ''){
+					$('#rhumerie option[value="'+$('input[name="options_rhumerie"]').val()+'"]').attr('selected','');
+				}
+
+				// remplace l'id_rhumerie par le nom dans le tableau
+				$('.commandedet_extras_rhumerie').each(function(){
+					var name = $('#rhumerie').find('option[value="'+$(this).text()+'"]').html();
+					$(this).html(name);
 				});
 			});
 			</script>

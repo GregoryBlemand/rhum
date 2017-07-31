@@ -293,21 +293,6 @@ class InterfaceRhumtrigger
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
-            global $db, $user;
-            
-            $id = $object->fk_product;
-            $prod = new Product($db);
-            $prod->fetch($id);
-            $extrafields = new ExtraFields($db);
-            $extralabels=$extrafields->fetch_name_optionals_label('product'); // Get extrafields cols
-            $prod->fetch_optionals($id,$extralabels); //fill $prod->array_options
-            foreach($extralabels as $col=>$val)       // Build a new array_options
-            	$new_options['options_'.$col]=$prod->array_options['options_'.$col];
-            	$new_options['options_MyPersoField']='ceci est un test'; // Update the target field
-            	$prod->array_options=$new_options; // Replace arry_option by the new one
-            	$prod->update($id, $user); // Save the values;
-            
-            var_dump($object, $_POST);exit;
             
         } elseif ($action == 'LINEORDER_DELETE') {
             dol_syslog(

@@ -64,11 +64,13 @@
 		
 		<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.getId()]&action=clone" class="butAction">[langs.transnoentities(ToClone)]</a></div>
 		
-		<!-- '-+' est l'équivalent d'un signe '<' (TBS oblige) -->
-		[onshow;block=begin;when [object.status]-+[TRhum.STATUS_REFUSED]]
-			
-			<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.getId()]&action=delete" class="butActionDelete">[langs.transnoentities(Delete)]</a></div>
-			
+		[onshow;block=begin;when [user.rights.rhum.delete;noerr]=1]
+			<!-- '-+' est l'équivalent d'un signe '<' (TBS oblige) -->
+			[onshow;block=begin;when [object.status]-+[TRhum.STATUS_REFUSED]]
+				
+				<div class="inline-block divButAction"><a href="[view.urlcard]?id=[object.getId()]&action=delete" class="butActionDelete">[langs.transnoentities(Delete)]</a></div>
+				
+			[onshow;block=end]
 		[onshow;block=end]
 		
 	[onshow;block=end]
