@@ -216,7 +216,7 @@ class modRhum extends DolibarrModules
 		// Add here entries to declare new menus
 		//
 		// Example to declare a new Top Menu entry and its Left menu entry:
-		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum',		// Put 0 if this is a single top menu or keep fk_mainmenu to give an entry on left
+/*		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum',		// Put 0 if this is a single top menu or keep fk_mainmenu to give an entry on left
 									'type'=>'top',			                // This is a Top menu entry
 									'titre'=>'Rhumeries',
 									'mainmenu'=>'rhum',
@@ -245,21 +245,7 @@ class modRhum extends DolibarrModules
 									'user'=>0);				                // 0=Menu for internal users, 1=external users, 2=both
 		 $r++;
 		
-/*		 
-		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-		 		'type'=>'left',			                // This is a Left menu entry
-		 		'titre'=>'Liste',
-		 		'mainmenu'=>'rhum',
-		 		'leftmenu'=>'rhum_left',			// Goes into left menu previously created by the mainmenu
-		 		'url'=>'/rhum/list.php',
-		 		'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-		 		'position'=>100,
-		 		'enabled'=>'$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->rhum->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		 		'perms'=>'$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->rhum->level1->level2' if you want your menu with a permission rules
-		 		'target'=>'',
-		 		'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
-		 $r++;
-		 
+*/		 
 
 		$this->menu[$r]=array(	
 			'fk_menu'=>0,			                // Put 0 if this is a top menu
@@ -296,7 +282,7 @@ class modRhum extends DolibarrModules
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('LeftMenuRhumCreate'),
+			'titre'=>$langs->trans('Nouvelle Rhumerie'),
 			'mainmenu'=>'rhum',
 			'leftmenu'=>'rhum_left_create',
 			'url'=>'/rhum/card.php?action=create',
@@ -313,19 +299,83 @@ class modRhum extends DolibarrModules
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
-			'titre'=>$langs->trans('LeftMenuRhumList'),
+			'titre'=>$langs->trans('List'),
 			'mainmenu'=>'rhum',
 			'leftmenu'=>'rhum_left_list',
 			'url'=>'/rhum/list.php',
 			'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>100+$r,
 			'enabled'=> '$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'=> '$user->rights->rhum->write',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
+			'perms'=> '$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>2
 		);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-*/
+		
+		$this->menu[$r]=array(
+				'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left_list',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+				'type'=>'left',			                // This is a Left menu entry
+				'titre'=>$langs->trans('Draft'),
+				'mainmenu'=>'rhum',
+				'leftmenu'=>'rhum_left_draft',
+				'url'=>'/rhum/list.php?TListTBS[rhum][search][status]=0',
+				'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+				'position'=>100+$r,
+				'enabled'=> '$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+				'perms'=> '$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
+				'target'=>'',
+				'user'=>2
+		);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
+		$this->menu[$r]=array(
+				'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left_list',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+				'type'=>'left',			                // This is a Left menu entry
+				'titre'=>$langs->trans('Validated'),
+				'mainmenu'=>'rhum',
+				'leftmenu'=>'rhum_left_validated',
+				'url'=>'/rhum/list.php?TListTBS[rhum][search][status]=1',
+				'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+				'position'=>100+$r,
+				'enabled'=> '$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+				'perms'=> '$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
+				'target'=>'',
+				'user'=>2
+		);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
+		$this->menu[$r]=array(
+				'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left_list',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+				'type'=>'left',			                // This is a Left menu entry
+				'titre'=>$langs->trans('Refused'),
+				'mainmenu'=>'rhum',
+				'leftmenu'=>'rhum_left_refused',
+				'url'=>'/rhum/list.php?TListTBS[rhum][search][status]=3',
+				'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+				'position'=>100+$r,
+				'enabled'=> '$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+				'perms'=> '$user->rights->rhum->read',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
+				'target'=>'',
+				'user'=>2
+		);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
+		$this->menu[$r]=array(
+				'fk_menu'=>'fk_mainmenu=rhum,fk_leftmenu=rhum_left_list',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+				'type'=>'left',			                // This is a Left menu entry
+				'titre'=>$langs->trans('Accepted'),
+				'mainmenu'=>'rhum',
+				'leftmenu'=>'rhum_left_accepted',
+				'url'=>'/rhum/list.php?TListTBS[rhum][search][status]=4',
+				'langs'=>'rhum@rhum',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+				'position'=>100+$r,
+				'enabled'=> '$conf->rhum->enabled',  // Define condition to show or hide menu entry. Use '$conf->missionorder->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+				'perms'=> '$user->rights->rhum->delete',			                // Use 'perms'=>'$user->rights->missionorder->level1->level2' if you want your menu with a permission rules
+				'target'=>'',
+				'user'=>2
+		);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+
 		
 		// Exports
 		$r=1;

@@ -86,8 +86,9 @@ echo $r->render($PDOdb, $sql, array(
 	,'search' => array(
 		'date_cre' => array('recherche' => 'calendars', 'allow_is_null' => true)
 		,'date_maj' => array('recherche' => 'calendars', 'allow_is_null' => false)
+		,'status' => array('recherche' => TRhumerie::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
 		,'ref' => array('recherche' => true, 'table' => 't', 'field' => 'ref')
-		,'label' => array('recherche' => true, 'table' => array('t', 't'), 'field' => array('label', 'description')) // input text de recherche sur plusieurs champs
+		,'label' => array('recherche' => true, 'table' => 't', 'field' => 'label')
 	)
 	,'translate' => array()
 	,'hide' => array(
@@ -105,11 +106,13 @@ echo $r->render($PDOdb, $sql, array(
 	,'title'=>array(
 		'ref' => $langs->trans('Ref.')
 		,'label' => $langs->trans('Label')
+		,'status' => $langs->trans('Status')
 		,'date_cre' => $langs->trans('DateCre')
 		,'date_maj' => $langs->trans('DateMaj')
 	)
 	,'eval'=>array(
 //		'fk_user' => '_getUserNomUrl(@val@)' // Si on a un fk_user dans notre requête
+		'status' => '_getLibStatut(@val@)'	
 	)
 ));
 
@@ -140,4 +143,30 @@ function _getUserNomUrl($fk_user)
 	}
 	
 	return '';
+}
+
+function _getLibStatut($status)
+{
+	global $langs;
+	
+	switch ($status){
+		case (0):
+			return img_picto('RhumStatusDraft', 'statut'.$status).' '.$langs->trans('Draft');
+			break;
+			
+		case (1):
+			return img_picto('RhumStatusValidated', 'statut'.$status).' '.$langs->trans('Validated');
+			break;
+			
+		case (2):
+			return img_picto('RhumStatusRefused', 'statut'.$status).' '.$langs->trans('Refused');
+			break;
+			
+		case (3):
+			return img_picto('RhumStatusAccepted', 'statut'.$status).' '.$langs->trans('Accepted');
+			break;
+			
+		Default:
+			return '';
+	}
 }

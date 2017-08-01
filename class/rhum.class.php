@@ -31,9 +31,9 @@ class TRhumerie extends TObjetStd
 	
 	public static $TStatus = array(
 		self::STATUS_DRAFT => 'Draft'
-		,self::STATUS_VALIDATED => 'Validate'
-		,self::STATUS_REFUSED => 'Refuse'
-		,self::STATUS_ACCEPTED => 'Accept'
+		,self::STATUS_VALIDATED => 'Validated'
+		,self::STATUS_REFUSED => 'Refused'
+		,self::STATUS_ACCEPTED => 'Accepted'
 	);
 
 

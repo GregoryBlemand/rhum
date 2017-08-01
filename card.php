@@ -49,7 +49,22 @@ if (empty($reshook))
 	switch ($action) {
 		case 'save':
 			if($user->rights->rhum->write){ // si l'utilisateur à les droits en écriture
+				$_POST['label'] = trim(GETPOST('label'));
 				$object->set_values($_REQUEST); // Set standard attributes
+				$object->label = trim($object->label);
+				
+				// Check parameters
+				if (empty($object->label))
+				{
+					$error++;
+					setEventMessages($langs->trans('warning_no_label'), array(), 'errors');
+				}
+				
+				if ($object->fk_soc < 0)
+				{
+					$error++;
+					setEventMessages($langs->trans('warning_no_soc'), array(), 'errors');
+				}
 				
 	//			$object->date_other = dol_mktime(GETPOST('starthour'), GETPOST('startmin'), 0, GETPOST('startmonth'), GETPOST('startday'), GETPOST('startyear'));
 	
@@ -64,8 +79,8 @@ if (empty($reshook))
 				
 				if ($error > 0)
 				{
-					$mode = 'edit';
-					break;
+					header('Location: '.dol_buildpath('/rhum/card.php', 1).'?action=create');
+					exit;
 				}
 				
 				$object->save($PDOdb, empty($object->ref));

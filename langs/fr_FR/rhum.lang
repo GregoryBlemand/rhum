@@ -22,8 +22,12 @@ Validate=Validé
 Refused=Refusé
 Accepted=Accepté
 
+warning_no_label=Le champ libellé est vide
+warning_no_soc=Il faut choisir une société
+
 # LIST
 RhumerieList=Liste Rhumeries
+NewRhumerie=Nouvelle Rhumerie
 NoRhum=(vide)
 DateCre=Création
 DateMaj=Mise à jour
