@@ -60,8 +60,19 @@ if (empty($reshook))
 			
 			
 		}
+	} else if($action == 'del_prod'){
+		if(! empty($user->rights->rhum->write)){
+			$prod = GETPOST('id');
+			$sql = 'DELETE FROM ' . MAIN_DB_PREFIX . 'dispo_rhumerie WHERE fk_product=' .$prod.' AND fk_rhumerie='.$fk_rhumerie;
+			$res = $db->query($sql);
+			
+			if($res){
+				setEventMessages('Produit supprimé', null, 'mesgs');
+			} else {
+				setEventMessages('Aucun produit supprimé', null, 'errors');
+			}
+		}
 	}
-	
 }
 
 
@@ -77,19 +88,18 @@ dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
 //if (empty($user->rights->rhum->all->read)) $type = 'mine';
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
-$sql = 'SELECT t.rowid, t.ref, t.label FROM '.MAIN_DB_PREFIX.'product t INNER JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product AND d.fk_rhumerie ='.$fk_rhumerie;
 
-/*
-$sql = 'SELECT t.rowid, t.ref, t.label, t.date_cre, t.date_maj, t.prix';
+$nb = 'SELECT COUNT(*) AS total FROM '.MAIN_DB_PREFIX.'product t INNER JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product AND d.fk_rhumerie ='.$fk_rhumerie;
+$res = $db->query($nb);
 
-$sql.= ' FROM '.MAIN_DB_PREFIX.'rhum t ';
+if($res){
+	$obj = $db->fetch_object($res);
+	$total = $obj->total;
+} else {
+	$total = 0;
+}
 
-$sql.= ' WHERE 1=1';
-
-$sql.= ' AND fk_rhumerie = '.$fk_rhumerie; */
-//$sql.= ' AND t.entity IN ('.getEntity('Rhum', 1).')';
-//if ($type == 'mine') $sql.= ' AND t.fk_user = '.$user->id;
-
+$sql = 'SELECT t.rowid, t.ref, t.label, \'\' AS Supprimer FROM '.MAIN_DB_PREFIX.'product t INNER JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product AND d.fk_rhumerie ='.$fk_rhumerie;
 
 $formcore = new TFormCore($_SERVER['PHP_SELF'], 'form_list_rhum', 'GET');
 
@@ -103,7 +113,8 @@ echo $r->render($PDOdb, $sql, array(
 	)
 	,'subQuery' => array()
 	,'link' => array(
-			'label'=>'<a href="rhum.php?id=@rowid@">@val@</a>'
+			'label'=>'<a href="../product/card.php?id=@rowid@">@val@</a>'
+			,'Supprimer'=>'<a href="?fk_rhumerie='.$fk_rhumerie.'&action=del_prod&id=@rowid@">X</a>'
 	)
 	,'type' => array(
 		'date_cre' => 'date' // [datetime], [hour], [money], [number], [integer]
@@ -118,7 +129,7 @@ echo $r->render($PDOdb, $sql, array(
 		'rowid'
 	)
 	,'liste' => array(
-		'titre' => $langs->trans('Dispos').' chez "'.$object->label.'"'
+		'titre' => $langs->trans('Dispos').' chez "'.$object->label.'" ('.$total.')'
 		,'image' => img_picto('','title_generic.png', '', 0)
 		,'picto_precedent' => '<'
 		,'picto_suivant' => '>'
@@ -144,7 +155,15 @@ print $hookmanager->resPrint;
 // print "<div class=\"tabsAction\"><a href=\"rhum.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\" class=\"butAction\"> Nouveau Rhum </a></div>";
 $formcore->end_form();
 
-$sql = 'SELECT t.rowid, t.label FROM '.MAIN_DB_PREFIX.'product t WHERE 1=1';
+/*
+tous les prod non-dispo dans cette rhumerie ??
+SELECT t.rowid, t.label
+FROM llx_product t
+LEFT JOIN llx_dispo_rhumerie d ON t.rowid = d.fk_product
+WHERE d.fk_product != 2
+ */
+
+$sql = 'SELECT t.rowid, t.label FROM '.MAIN_DB_PREFIX.'product t LEFT JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product WHERE d.fk_product !='.$fk_rhumerie;
 $res = $db->query($sql);
 
 if($res){

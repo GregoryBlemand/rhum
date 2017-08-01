@@ -103,34 +103,12 @@ class ActionsRhum
 		
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
-			global $db;
 			
-			// récupérer la liste des rhumeries à afficher
-			$sql = 'SELECT t.rowid, t.label';
-			$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
-			$sql.= ' WHERE 1';
-			
-			$res = $db->query($sql);
-			
-			if($res){
-				$select = '<select name="rhumerie" id="rhumerie">';
-				$select .= '<option value="0"></option>';
-				$select2 = array();
-				while($obj = $db->fetch_object($res)){
-					$select .= '<option value="' . $obj->rowid . '">' . $obj->label . '</option>';
-					$select2[$obj->rowid] = $obj->label;
-				}
-				
-				$select .= '</select>';
-			}
-			$form = new Form($db);
-			$output = $form->selectarray('rhumerie', $select2, '',1,0,0,'',0,20,0,'','',1);
-			print '<tr><td>'.$output.'<td></tr>';
 			
 			?>
 			<script type="text/javascript">
 			$(document).ready(function(){
-				$('div.rhumerie').hide();
+				
 				if($('#rhumerie').length == 0){
 					$('input[name="options_rhumerie"]').hide().parent().append('<?php  ?>');
 					$('#rhumerie').on('change', function(){
@@ -170,14 +148,38 @@ class ActionsRhum
 	{
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
-			print 'lol';
+			
+			global $db;
+			
+			// récupérer la liste des rhumeries à afficher
+			$sql = 'SELECT t.rowid, t.label';
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
+			$sql.= ' WHERE 1';
+			
+			$res = $db->query($sql);
+			
+			if($res){
+				$select = array();
+				while($obj = $db->fetch_object($res)){
+					$select[$obj->rowid] = $obj->label;
+				}
+			}
+			$form = new Form($db);
+			$output = $form->selectarray('rhumerie', $select, '',1,0,0,'',0,20,0,'','',1);
+			print $output;
+			
 			?>
 			<script type="text/javascript">
-			<!--  -->
+			
 			$(document).ready(function(){
 				$('input[name="options_rhumerie"]').parent().parent().hide();
 				$('#idprod').on('change', function(){
 					console.log($(this).val());
+
+					<!-- faire une requète sql qui affiche toutes les rhumeries dans lesquelles le prod est dispo
+					'SELECT t.rowid, t.label FROM llx_rhumerie INNER JOIN llx_dispo_rhumerie d ON t.rowid = d.fk_rhumerie AND d.fk_product =' $(this).val() 
+					-->
+					
 				});
 			});
 			
