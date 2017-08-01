@@ -115,19 +115,24 @@ class ActionsRhum
 			if($res){
 				$select = '<select name="rhumerie" id="rhumerie">';
 				$select .= '<option value="0"></option>';
-				
+				$select2 = array();
 				while($obj = $db->fetch_object($res)){
 					$select .= '<option value="' . $obj->rowid . '">' . $obj->label . '</option>';
+					$select2[$obj->rowid] = $obj->label;
 				}
-		
+				
 				$select .= '</select>';
 			}
+			$form = new Form($db);
+			$output = $form->selectarray('rhumerie', $select2, '',1,0,0,'',0,20,0,'','',1);
+			print '<tr><td>'.$output.'<td></tr>';
 			
 			?>
 			<script type="text/javascript">
 			$(document).ready(function(){
+				$('div.rhumerie').hide();
 				if($('#rhumerie').length == 0){
-					$('input[name="options_rhumerie"]').hide().parent().append('<?php print $select ?>');
+					$('input[name="options_rhumerie"]').hide().parent().append('<?php  ?>');
 					$('#rhumerie').on('change', function(){
 						// Le champ de l'extrafield prend la valeur du select => l'id de la rhummerie
 						var rhumerie = $('#rhumerie').val();
@@ -158,6 +163,28 @@ class ActionsRhum
 		{
 			$this->errors[] = 'Error message';
 			return -1;
+		}
+	}
+	
+	function formCreateProductOptions($parameters, &$object, &$action, $hookmanager)
+	{
+		if (in_array('ordercard', explode(':', $parameters['context'])))
+		{
+			print 'lol';
+			?>
+			<script type="text/javascript">
+			<!--  -->
+			$(document).ready(function(){
+				$('input[name="options_rhumerie"]').parent().parent().hide();
+				$('#idprod').on('change', function(){
+					console.log($(this).val());
+				});
+			});
+			
+			</script>
+			
+			<?php
+			
 		}
 	}
 }

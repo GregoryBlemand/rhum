@@ -84,11 +84,11 @@ echo $r->render($PDOdb, $sql, array(
 		,'date_maj' => 'date'
 	)
 	,'search' => array(
-		'date_cre' => array('recherche' => 'calendars', 'allow_is_null' => true)
+		'ref' => array('recherche' => true, 'table' => 't', 'field' => 'ref')
+		,'label' => array('recherche' => true, 'table' => 't', 'field' => 'label')
+		,'date_cre' => array('recherche' => 'calendars', 'allow_is_null' => true)
 		,'date_maj' => array('recherche' => 'calendars', 'allow_is_null' => false)
 		,'status' => array('recherche' => TRhumerie::$TStatus, 'to_translate' => true) // select html, la clé = le status de l'objet, 'to_translate' à true si nécessaire
-		,'ref' => array('recherche' => true, 'table' => 't', 'field' => 'ref')
-		,'label' => array('recherche' => true, 'table' => 't', 'field' => 'label')
 	)
 	,'translate' => array()
 	,'hide' => array(

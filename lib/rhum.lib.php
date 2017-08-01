@@ -70,6 +70,11 @@ function rhum_prepare_head(TRhumerie $object)
     $head[$h][2] = 'card';
     $h++;
     
+    $head[$h][0] = dol_buildpath('/rhum/list-rhum.php', 1).'?fk_rhumerie='.$object->getId();
+    $head[$h][1] = $langs->trans("Dispos");
+    $head[$h][2] = 'rhum';
+    $h++;
+    
 	// Show more tabs from modules
     // Entries must be declared in modules descriptor with line
     // $this->tabs = array('entity:+tabname:Title:@rhum:/rhum/mypage.php?id=__ID__');   to add new tab

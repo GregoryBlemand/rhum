@@ -37,6 +37,8 @@ NewRhum=Création Rhumerie
 RhumCard=Fiche Rhumerie
 Rhums=Rhums
 RhumsList=Liste des rhums
+Dispos=Produits disponibles
+addProd=Ajouter
 
 # CARD TPL
 Save=Enregistrer
