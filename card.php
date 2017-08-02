@@ -197,6 +197,30 @@ function _card(TRhumerie &$object, $action, $mode) {
 		dol_fiche_head($head, 'card', $langs->trans("Rhumerie"), 0, $picto);
 	}
 	
+	$nb = 'SELECT COUNT(*) AS total FROM '.MAIN_DB_PREFIX.'product t INNER JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product AND d.fk_rhumerie ='.$object->rowid;
+	$res = $db->query($nb);
+	
+	if($res){
+		$obj = $db->fetch_object($res);
+		$total = $obj->total;
+	} else {
+		$total = 0;
+	}
+	
+	?>
+	
+	<script type="text/javascript">
+	<!--  -->
+	$(document).ready(function(){
+		lien = $('#rhum').html();
+		lien = lien +' <span class="badge">'+ <?php print $total ?> + '</span>';
+		console.log(lien);
+		$('#rhum').html(lien);
+	});
+	</script>
+	
+	<?php
+	
 	$formcore = new TFormCore;
 	$formcore->Set_typeaff($mode);
 	

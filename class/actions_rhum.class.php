@@ -86,19 +86,7 @@ class ActionsRhum
 		
 		if (in_array('productcard', explode(':', $parameters['context'])))
 		{
-			?>
-			<script type="text/javascript">
-				// ajoute la "nature" rhum au select nature pour pouvoir jouer avec durant la commande
-				$(document).ready(function(){
-					if($('#finished').lenght > 0){
-						$('#finished').append('<option value=\"2\">Rhum</option>');
-					}
-				});
-			</script>
 			
-			
-			
-			<?php 
 		}
 		
 		if (in_array('ordercard', explode(':', $parameters['context'])))
@@ -124,13 +112,22 @@ class ActionsRhum
 			print '<div style="display: none;">'.$output.'</div>';
 					
 			?>
+			
 			<script type="text/javascript">
 			$(document).ready(function(){
+				$('<td width="110">Rhumerie</td>').insertAfter('tr.liste_titre.nodrag.nodrop td.linecoldescription');
 				
 				// remplace l'id_rhumerie par le nom dans le tableau
 				$('.commandedet_extras_rhumerie').each(function(){
 					var name = $('#rhum').find('option[value="'+$(this).text()+'"]').html();
 					$(this).html(name);
+				});
+
+				$('#tablelines tr').each(function(i){
+					if(i > 0){
+						$(this).next().find('.commandedet_extras_rhumerie').insertAfter($(this).children()[0]).removeAttribute('colspan');
+						$(this).next().hide();
+					}
 				});
 			});
 			</script>
@@ -181,18 +178,16 @@ class ActionsRhum
 						$('#addline').on('click', function(e){
 							if($('#idprod').val() != ''){
 								if($('select.rhumerie').val() == '-1'){
-									e.preventDefault();
+									e.preventDefault(); e.stopPropagation();
 									alert('Vous n\'avez pas sélectionné de rhumerie !');
 								} else if ($('select.rhumerie').length == 0){
-									e.preventDefault();
+									e.preventDefault(); e.stopPropagation();
 									alert('Ce produit ne peut être commandé en l\'état ! il faut l\'assigner à une rhumerie...');
 								}	
 							}
 						});
 					});
 				});
-
-
 			});
 			
 			</script>
@@ -240,7 +235,7 @@ class ActionsRhum
 
 					$('#savelinebutton').on('click', function(e){
 						if($('select.rhumerie').val() == '-1'){
-							e.preventDefault();
+							e.preventDefault(); e.stopPropagation();
 							alert('Vous n\'avez pas sélectionné de rhumerie !');
 						}
 					});

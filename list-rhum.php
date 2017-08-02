@@ -107,16 +107,6 @@ dol_fiche_head($head, 'rhum', $langs->trans("Rhums"), 0, $picto);
 
 // TODO ajouter les champs de son objet que l'on souhaite afficher
 
-$nb = 'SELECT COUNT(*) AS total FROM '.MAIN_DB_PREFIX.'product t INNER JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product AND d.fk_rhumerie ='.$fk_rhumerie;
-$res = $db->query($nb);
-
-if($res){
-	$obj = $db->fetch_object($res);
-	$total = $obj->total;
-} else {
-	$total = 0;
-}
-
 $sql = 'SELECT t.rowid, t.ref, t.label, \'\' AS Supprimer FROM '.MAIN_DB_PREFIX.'product t INNER JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product AND d.fk_rhumerie ='.$fk_rhumerie;
 
 $formcore = new TFormCore($_SERVER['PHP_SELF'], 'form_list_rhum', 'GET');
@@ -147,7 +137,7 @@ echo $r->render($PDOdb, $sql, array(
 		'rowid'
 	)
 	,'liste' => array(
-		'titre' => $langs->trans('Dispos').' chez "'.$object->label.'" ('.$total.')'
+		'titre' => $langs->trans('Dispos').' chez "'.$object->label.'"'
 		,'image' => img_picto('','title_generic.png', '', 0)
 		,'picto_precedent' => '<'
 		,'picto_suivant' => '>'
