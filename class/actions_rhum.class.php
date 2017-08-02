@@ -104,26 +104,32 @@ class ActionsRhum
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
 			
+			global $db;
 			
+			// récupérer la liste des rhumeries à afficher dans les td
+			$sql = 'SELECT t.rowid, t.label';
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
+			$sql.= ' WHERE 1';
+			
+			$res = $db->query($sql);
+			
+			if($res){
+				$select = array();
+				while($obj = $db->fetch_object($res)){
+					$select[$obj->rowid] = $obj->label;
+				}
+			}
+			$form = new Form($db);
+			$output = $form->selectarray('rhum', $select, '',1,0,0,'style="width: 120px;"',0,20,0,'','',1);
+			print '<div style="display: none;">'.$output.'</div>';
+					
 			?>
 			<script type="text/javascript">
 			$(document).ready(function(){
 				
-				if($('#rhumerie').length == 0){
-					$('input[name="options_rhumerie"]').hide().parent().append('<?php  ?>');
-					$('#rhumerie').on('change', function(){
-						// Le champ de l'extrafield prend la valeur du select => l'id de la rhummerie
-						var rhumerie = $('#rhumerie').val();
-						$('input[name="options_rhumerie"]').attr('value', rhumerie);
-					});
-				}
-				if($('input[name="options_rhumerie"]').val() !== ''){
-					$('#rhumerie option[value="'+$('input[name="options_rhumerie"]').val()+'"]').attr('selected','');
-				}
-
 				// remplace l'id_rhumerie par le nom dans le tableau
 				$('.commandedet_extras_rhumerie').each(function(){
-					var name = $('#rhumerie').find('option[value="'+$(this).text()+'"]').html();
+					var name = $('#rhum').find('option[value="'+$(this).text()+'"]').html();
 					$(this).html(name);
 				});
 			});
@@ -149,38 +155,44 @@ class ActionsRhum
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
 			
-			global $db;
-			
-			// récupérer la liste des rhumeries à afficher
-			$sql = 'SELECT t.rowid, t.label';
-			$sql.= ' FROM '.MAIN_DB_PREFIX.'rhumerie t ';
-			$sql.= ' WHERE 1';
-			
-			$res = $db->query($sql);
-			
-			if($res){
-				$select = array();
-				while($obj = $db->fetch_object($res)){
-					$select[$obj->rowid] = $obj->label;
-				}
-			}
-			$form = new Form($db);
-			$output = $form->selectarray('rhumerie', $select, '',1,0,0,'',0,20,0,'','',1);
-			print $output;
+			print '<div id="selrhum" style="display: inline-block;margin-left: 10px;"></div>';
 			
 			?>
 			<script type="text/javascript">
 			
 			$(document).ready(function(){
+				// cache la ligne de l'extrafield
 				$('input[name="options_rhumerie"]').parent().parent().hide();
+				
 				$('#idprod').on('change', function(){
-					console.log($(this).val());
 
-					<!-- faire une requète sql qui affiche toutes les rhumeries dans lesquelles le prod est dispo
-					'SELECT t.rowid, t.label FROM llx_rhumerie INNER JOIN llx_dispo_rhumerie d ON t.rowid = d.fk_rhumerie AND d.fk_product =' $(this).val() 
-					-->
-					
+					$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxselect&idprod=',1); ?>"+$(this).val(), function(data) {
+						var html = $(data);
+						$('#selrhum').html(html);
+
+						$('select.rhumerie').on('change', function(){
+
+							// Le champ de l'extrafield prend la valeur du select => l'id de la rhummerie
+							var rhumerie = $(this).val();
+							$('input[name="options_rhumerie"]').val(rhumerie);
+						})
+
+						// interception en cas de rhumerie non-selectionnée
+						$('#addline').on('click', function(e){
+							if($('#idprod').val() != ''){
+								if($('select.rhumerie').val() == '-1'){
+									e.preventDefault();
+									alert('Vous n\'avez pas sélectionné de rhumerie !');
+								} else if ($('select.rhumerie').length == 0){
+									e.preventDefault();
+									alert('Ce produit ne peut être commandé en l\'état ! il faut l\'assigner à une rhumerie...');
+								}	
+							}
+						});
+					});
 				});
+
+
 			});
 			
 			</script>
@@ -189,4 +201,56 @@ class ActionsRhum
 			
 		}
 	}
+	
+	
+	function formEditProductOptions($parameters, &$object, &$action, $hookmanager)
+	{
+		if (in_array('ordercard', explode(':', $parameters['context'])))
+		{
+			print '<label>Rhumerie : </label><div id="selrhum" style="display: inline-block;margin-left: 10px;"></div>';
+				
+			?>
+			<script type="text/javascript">
+			$(document).ready(function(){
+				// cache la ligne de l'extrafield
+				$('input[name="options_rhumerie"]').parent().parent().hide();
+
+				line = $('#line_'+<?php print GETPOST('lineid');?>).parent().find('a').attr('href');
+				idprod = line.substring(line.lastIndexOf('=')+1)
+
+				$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxselect&idprod=',1); ?>"+idprod, function(data) {
+					var html = $(data);
+					// chargement du select
+					$('#selrhum').html(html);
+
+					$('select.rhumerie').on('change', function(){
+
+						// Le champ de l'extrafield prend la valeur du select => l'id de la rhummerie
+						var rhumerie = $(this).val();
+						$('input[name="options_rhumerie"]').val(rhumerie);
+					})
+
+					if($('input[name="options_rhumerie"]').val() != ''){
+						// mise a jour du select au chargement
+						var id = $('input[name="options_rhumerie"]').val();
+						$('select.rhumerie').find('option[value=\"'+id+'\"]').attr('selected', '');
+						$('#selrhum').find('.select2-chosen').html($('select.rhumerie').find('option[value='+id+']').html());
+
+					}
+
+					$('#savelinebutton').on('click', function(e){
+						if($('select.rhumerie').val() == '-1'){
+							e.preventDefault();
+							alert('Vous n\'avez pas sélectionné de rhumerie !');
+						}
+					});
+				});
+									
+			});
+			</script>
+			
+			<?php
+		}
+	}
+
 }

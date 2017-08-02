@@ -47,6 +47,33 @@ if (empty($reshook))
 {
 	$error = 0;
 	switch ($action) {
+		case 'ajaxselect':
+			
+			global $db;
+			
+			// récupérer la liste des rhumeries à afficher
+			$prod = GETPOST('idprod', 'int');
+			$sql = 'SELECT t.rowid, t.label FROM `llx_rhumerie` t LEFT JOIN `llx_dispo_rhumerie` d ON t.rowid = d.fk_rhumerie WHERE d.fk_product =' . $prod;
+			
+			$res = $db->query($sql);
+			$i = 0;
+			if($res){
+				$select = array();
+				while($obj = $db->fetch_object($res)){
+					$select[$obj->rowid] = $obj->label;
+					$i++;
+				}
+			}
+			if($i > 0){
+				$form = new Form($db);
+				$output = $form->selectarray('rhumerie', $select, '',1,0,0,'style="width: 120px;"',0,20,0,'','',1);
+			} else {
+				$output = "<p>Produit disponible dans aucune rhumerie <a href=\"".dol_buildpath('/rhum/list.php', 1)."\">cliquez ici pour l'assigner</a></p>";
+			}
+			print $output;
+			
+			break;
+		
 		case 'save':
 			if($user->rights->rhum->write){ // si l'utilisateur à les droits en écriture
 				$_POST['label'] = trim(GETPOST('label'));

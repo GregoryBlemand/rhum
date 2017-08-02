@@ -7,6 +7,8 @@ RhumSetup = Configuration du module Rhum
 RhumAbout = A propos du module Rhum
 
 Rhumerie=Rhumerie
+extrafieldCreated= Champ complémentaire créé
+extrafieldNotCreated= le champ complémentaire n'a pas pu être créé 
 
 # MENU
 TopMenuRhum=Rhumerie

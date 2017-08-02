@@ -45,14 +45,32 @@ if (empty($reshook))
 	if($action == 'add_prod'){
 		if(! empty($user->rights->rhum->write)){
 			$prod = GETPOST('rhumerie');
-			if($prod !== -1){
-				$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'dispo_rhumerie(fk_product, fk_rhumerie) VALUES('.$prod.', '.$fk_rhumerie.')';
-				$res = $db->query($sql);
+			if($prod !== '-1'){ // si un produit a été selectionné dans le select
 				
-				if($res){
-					setEventMessages('Produit Ajouté', null, 'mesgs');
+				// je verifie si l'enregistrement n'existe pas déjà (ex: touche F5) pour éviter les doublons.
+				
+				$req = 'SELECT COUNT(t.rowid) AS total'; // compte tous les produits
+				$req .= ' FROM '. MAIN_DB_PREFIX .'product t';
+				$req .= ' LEFT JOIN '. MAIN_DB_PREFIX .'dispo_rhumerie d'; // qui sont dans la table dispo
+				$req .= ' ON t.rowid = d.fk_product';
+				$req .= ' WHERE t.rowid = '. $prod; // dont l'id est $prod et qui ne sont pas déja enregistrer dans cette rhumerie (fk_rhumerie)
+				$req .= ' AND t.rowid NOT IN( SELECT fk_product FROM '. MAIN_DB_PREFIX .'dispo_rhumerie WHERE fk_rhumerie = '.$fk_rhumerie.')';
+				
+				$rep = $db->query($req);
+				$obj = $db->fetch_object($rep);
+				$total = $obj->total;
+				
+				if($total > 0){ // s'il n'est pas déjà enregistré
+					$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . 'dispo_rhumerie(fk_product, fk_rhumerie) VALUES('.$prod.', '.$fk_rhumerie.')';
+					$res = $db->query($sql);
+					
+					if($res){
+						setEventMessages('Produit Ajouté', null, 'mesgs');
+					} else {
+						setEventMessages('Aucun produit ajouté', null, 'errors');
+					}
 				} else {
-					setEventMessages('Aucun produit ajouté', null, 'errors');
+					setEventMessages('Produit déjà ajouté... pas de doublon', null, 'errors');
 				}
 			} else {
 				setEventMessages('Aucun produit ajouté', null, 'errors');
@@ -114,7 +132,7 @@ echo $r->render($PDOdb, $sql, array(
 	,'subQuery' => array()
 	,'link' => array(
 			'label'=>'<a href="../product/card.php?id=@rowid@">@val@</a>'
-			,'Supprimer'=>'<a href="?fk_rhumerie='.$fk_rhumerie.'&action=del_prod&id=@rowid@">X</a>'
+			,'Supprimer'=>'<a href="?fk_rhumerie='.$fk_rhumerie.'&action=del_prod&id=@rowid@">'.img_picto('delete','delete').'</a>'
 	)
 	,'type' => array(
 		'date_cre' => 'date' // [datetime], [hour], [money], [number], [integer]
@@ -155,15 +173,8 @@ print $hookmanager->resPrint;
 // print "<div class=\"tabsAction\"><a href=\"rhum.php?mode=edit&action=create&fk_rhumerie=".$object->getId()."\" class=\"butAction\"> Nouveau Rhum </a></div>";
 $formcore->end_form();
 
-/*
-tous les prod non-dispo dans cette rhumerie ??
-SELECT t.rowid, t.label
-FROM llx_product t
-LEFT JOIN llx_dispo_rhumerie d ON t.rowid = d.fk_product
-WHERE d.fk_product != 2
- */
-
-$sql = 'SELECT t.rowid, t.label FROM '.MAIN_DB_PREFIX.'product t LEFT JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product WHERE d.fk_product !='.$fk_rhumerie;
+//selection l'id et le label de tous les produits QUI NE SONT PAS DANS la selection de tous les produits déjà dispo dans la rhumerie
+$sql = 'SELECT t.rowid, t.label FROM '.MAIN_DB_PREFIX.'product t LEFT JOIN '.MAIN_DB_PREFIX.'dispo_rhumerie d ON t.rowid = d.fk_product WHERE t.rowid NOT IN( SELECT fk_product FROM '.MAIN_DB_PREFIX.'dispo_rhumerie WHERE fk_rhumerie = '.$fk_rhumerie.')';
 $res = $db->query($sql);
 
 if($res){

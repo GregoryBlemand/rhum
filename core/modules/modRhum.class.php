@@ -405,6 +405,9 @@ class modRhum extends DolibarrModules
 	 */
 	function init($options='')
 	{
+		global $db, $langs;
+		$langs->load('rhum@rhum');
+		
 		$sql = array();
 		
 		define('INC_FROM_DOLIBARR',true);
@@ -414,24 +417,28 @@ class modRhum extends DolibarrModules
 
 		$result=$this->_load_tables('/rhum/sql/');
 		
-		/*
 		require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 		
 		$extrafields = new ExtraFields($db);
 		$res=$extrafields->addExtraField(
 				'rhumerie',
 				'rhumerie',
-				'string',
+				'varchar',
 				0,
 				255,
-				'commandedet'
+				'commandedet',
+				0,
+				0,
+				'',
+				0,
+				1
 				);
 		if ($res > 0)
 		{
 			setEventMessages($langs->trans('extrafieldCreated'), null, 'mesgs');
 		} else {
 			setEventMessages($langs->trans('extrafieldNotCreated'), null, 'errors');
-		} */
+		}
 
 		return $this->_init($sql, $options);
 	}
