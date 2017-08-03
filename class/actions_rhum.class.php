@@ -115,7 +115,7 @@ class ActionsRhum
 			
 			<script type="text/javascript">
 			$(document).ready(function(){
-				$('<td width="110">Rhumerie</td>').insertAfter('tr.liste_titre.nodrag.nodrop td.linecoldescription');
+				$('<td>Rhumerie</td>').insertAfter('tr.liste_titre.nodrag.nodrop td.linecoldescription');
 				
 				// remplace l'id_rhumerie par le nom dans le tableau
 				$('.commandedet_extras_rhumerie').each(function(){
@@ -123,12 +123,17 @@ class ActionsRhum
 					$(this).html(name);
 				});
 
-				$('#tablelines tr').each(function(i){
-					if(i > 0){
-						$(this).next().find('.commandedet_extras_rhumerie').insertAfter($(this).children()[0]).removeAttribute('colspan');
-						$(this).next().hide();
-					}
+				$('#tablelines tr.drag.drop').each(function(i){
+					var html = $(this).next().find('.commandedet_extras_rhumerie').html();
+					var td = $('<td width="150"></td>');
+					td.append(html);
+					td.insertAfter($(this).children()[0]);
+					$(this).next().hide();
 				});
+				
+				addtd = $('<td class="nobottom">&nbsp</td>');
+				addtd.insertAfter($('tr.liste_titre_add').children()[0]);
+				addtd.clone().insertAfter($('#trlinefordates').children()[0]);
 			});
 			</script>
 			
@@ -162,9 +167,14 @@ class ActionsRhum
 				$('input[name="options_rhumerie"]').parent().parent().hide();
 				
 				$('#idprod').on('change', function(){
-
+					$('input[name="options_rhumerie"]').val('');
 					$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxselect&idprod=',1); ?>"+$(this).val(), function(data) {
-						var html = $(data);
+						if($('#idprod').val() != '0'){
+							var html = $(data);
+						} else {
+							var html = '';
+						}
+						
 						$('#selrhum').html(html);
 
 						$('select.rhumerie').on('change', function(){
@@ -173,20 +183,28 @@ class ActionsRhum
 							var rhumerie = $(this).val();
 							$('input[name="options_rhumerie"]').val(rhumerie);
 						})
-
-						// interception en cas de rhumerie non-selectionnée
-						$('#addline').on('click', function(e){
-							if($('#idprod').val() != ''){
-								if($('select.rhumerie').val() == '-1'){
-									e.preventDefault(); e.stopPropagation();
-									alert('Vous n\'avez pas sélectionné de rhumerie !');
-								} else if ($('select.rhumerie').length == 0){
-									e.preventDefault(); e.stopPropagation();
-									alert('Ce produit ne peut être commandé en l\'état ! il faut l\'assigner à une rhumerie...');
-								}	
-							}
-						});
 					});
+				});
+
+				// interception en cas de rhumerie non-selectionnée
+				$('#addline').on('click', function(e){
+					if($('#idprod').val() == '' || $('#idprod').val() == '-1' ||  $('#idprod').val() == '0'){ // si on a rien sélectionné
+						e.preventDefault();
+					} else { // si on a sélectionné un produit
+						if(($('input[name="options_rhumerie"]').val() == '-1' || $('input[name="options_rhumerie"]').val() == '') && $('select.rhumerie').length != 0){ // mais pas de rhumerie
+							e.preventDefault(); e.stopPropagation();
+																
+							$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=noselect',1); ?>", function(data) {
+								$('#selrhum').append(data);
+								$('[role=dialog]').last().find('.ui-button').last().html('<span class="ui-button-text">OK</span>').prev().remove();
+							})
+						} else if ($('select.rhumerie').length == 0){ // ou il n'y a pas de rhumerie à sélectionner
+							e.preventDefault(); e.stopPropagation();
+							$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=norhumerie',1); ?>", function(data) {
+								$('#selrhum').append(data);
+							})
+						}	
+					}
 				});
 			});
 			
@@ -203,23 +221,24 @@ class ActionsRhum
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
 			print '<label>Rhumerie : </label><div id="selrhum" style="display: inline-block;margin-left: 10px;"></div>';
-				
+
 			?>
 			<script type="text/javascript">
 			$(document).ready(function(){
 				// cache la ligne de l'extrafield
 				$('input[name="options_rhumerie"]').parent().parent().hide();
 
+				// récupère l'id du produit de la ligne pour préparer la requête ajax
 				line = $('#line_'+<?php print GETPOST('lineid');?>).parent().find('a').attr('href');
 				idprod = line.substring(line.lastIndexOf('=')+1)
 
+				// requête ajax qui récupère le selectarray des rhumerie dans lesquelles le produit est dispo
 				$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxselect&idprod=',1); ?>"+idprod, function(data) {
 					var html = $(data);
 					// chargement du select
 					$('#selrhum').html(html);
 
 					$('select.rhumerie').on('change', function(){
-
 						// Le champ de l'extrafield prend la valeur du select => l'id de la rhummerie
 						var rhumerie = $(this).val();
 						$('input[name="options_rhumerie"]').val(rhumerie);
@@ -236,7 +255,10 @@ class ActionsRhum
 					$('#savelinebutton').on('click', function(e){
 						if($('select.rhumerie').val() == '-1'){
 							e.preventDefault(); e.stopPropagation();
-							alert('Vous n\'avez pas sélectionné de rhumerie !');
+							$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=edit',1); ?>", function(data) {
+								$('#selrhum').append(data);
+								$('[role=dialog]').last().find('.ui-button').last().html('<span class="ui-button-text">OK</span>').prev().remove();
+							})
 						}
 					});
 				});
@@ -245,6 +267,7 @@ class ActionsRhum
 			</script>
 			
 			<?php
+			
 		}
 	}
 

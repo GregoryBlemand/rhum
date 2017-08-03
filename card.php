@@ -74,6 +74,26 @@ if (empty($reshook))
 			
 			break;
 		
+		case 'ajaxerrors' :
+			
+			$form = new Form($db);
+			
+			if(GETPOST('errors') == 'edit'){
+				$url = '';
+				$error = $langs->trans('rhumEditError');
+			} elseif (GETPOST('errors') == 'noselect'){
+				$url = '';
+				$error = $langs->trans('rhumEditError');
+			} elseif (GETPOST('errors') == 'norhumerie'){
+				$url = dol_buildpath('/rhum/list.php',1);
+				$error = $langs->trans('noRhumerie');;
+			}
+			
+			$formconfirm = $form->formconfirm($url, $langs->trans('pbRhum'), $error, '', '', 0, 1);
+			
+			print $formconfirm;
+			break;
+		
 		case 'save':
 			if($user->rights->rhum->write){ // si l'utilisateur à les droits en écriture
 				$_POST['label'] = trim(GETPOST('label'));
