@@ -8,10 +8,13 @@ RhumAbout = A propos du module Rhum
 
 Rhumerie=Rhumerie
 extrafieldCreated= Champ complémentaire créé
-extrafieldNotCreated= le champ complémentaire n'a pas pu être créé 
+extrafieldNotCreated= le champ complémentaire n'a pas pu être créé
+RhumerieObligatoire=Selectionner une rhumerie pour les produits prédéfinis est obligatoire
+
+#ERREURS
 pbRhum= Erreur !
 rhumEditError=Vous n'avez pas sélectionné de rhumerie !
-noRhumerie=Ce produit n'est disponible dans aucune rhumerie ! Voulez vous l'assigner à une rhumerie...
+noRhumerie=Ce produit n'est disponible dans aucune rhumerie ! Voulez vous l'assigner à une rhumerie ?
 
 # MENU
 TopMenuRhum=Rhumerie

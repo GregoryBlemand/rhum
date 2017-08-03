@@ -59,6 +59,53 @@ class ActionsRhum
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
+	function doActions($parameters, &$object, &$action, $hookmanager)
+	{
+		if (in_array('ordercard', explode(':', $parameters['context'])))
+		{
+			global $langs, $conf;
+			$langs->load('rhum@rhum');
+			
+			(empty($conf->global->RHUMERIE_OBLIGATOIRE)) ? print 'pas obligé...' : print 'obligé...';
+			
+			if(! empty($_POST)){
+				$prodMode = GETPOST('prod_entry_mode');
+				$idprod = GETPOST('idprod');
+				$rhumerie = GETPOST('options_rhumerie');
+				$rhumselect = GETPOST('rhumerie');
+				$commande = GETPOST('id');
+				
+				/*
+				 * Vérification des données envoyées côté serveur
+				 */ 
+				
+				// ajout d'un produit prédéfini
+				if($prodMode == 'predef'){
+					if($idprod !== '' && $idprod !== '-1' &&  $idprod !== '0'){
+						// A faire ici : vérifier la conf rhumerie obligatoire ou pas
+						// si ce n'est pas obligatoire, pas besoin de bloquer
+						
+						if($rhumselect !== null && ($rhumerie == '-1' || $rhumerie == '')){ 
+							setEventMessages($langs->trans('rhumEditError'), null, 'errors');
+						} elseif ($rhumselect == null){
+							setEventMessages($langs->trans('noRhumerie'), null, 'errors');
+						}
+						return 1;
+					}
+				}
+				
+				// modification d'une ligne de commande
+				if($rhumerie == '-1'){ // A faire ici : vérifier la conf rhumerie obligatoire ou pas
+					setEventMessages($langs->trans('rhumEditError'), null, 'errors');
+					return 1;
+				}
+			}
+			
+			return 0;
+			
+		}
+	}
+	
 	function formObjectOptions($parameters, &$object, &$action, $hookmanager)
 	{
 		global $db;
@@ -80,7 +127,7 @@ class ActionsRhum
 				$obj = $db->fetch_object($res);	
 			}
 			
-			echo '<tr><td>Nombre de brasseries gérées</td><td>'.$obj->total.'</td></tr>';
+			echo '<tr><td>Nombre de rhumeries gérées</td><td>'.$obj->total.'</td></tr>';
 		}
 		
 		
@@ -163,10 +210,15 @@ class ActionsRhum
 			<script type="text/javascript">
 			
 			$(document).ready(function(){
+				if($('#idprod').val() !== ''){
+					$('#idprod').val('');
+					$('#s2id_idprod').find('.select2-chosen').html('');
+				}
 				// cache la ligne de l'extrafield
 				$('input[name="options_rhumerie"]').parent().parent().hide();
 				
 				$('#idprod').on('change', function(){
+					$('#selrhum').prev().show();
 					$('input[name="options_rhumerie"]').val('');
 					$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxselect&idprod=',1); ?>"+$(this).val(), function(data) {
 						if($('#idprod').val() != '0'){
@@ -186,26 +238,33 @@ class ActionsRhum
 					});
 				});
 
+
+				
+				
 				// interception en cas de rhumerie non-selectionnée
-				$('#addline').on('click', function(e){
-					if($('#idprod').val() == '' || $('#idprod').val() == '-1' ||  $('#idprod').val() == '0'){ // si on a rien sélectionné
-						e.preventDefault();
-					} else { // si on a sélectionné un produit
-						if(($('input[name="options_rhumerie"]').val() == '-1' || $('input[name="options_rhumerie"]').val() == '') && $('select.rhumerie').length != 0){ // mais pas de rhumerie
-							e.preventDefault(); e.stopPropagation();
-																
-							$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=noselect',1); ?>", function(data) {
-								$('#selrhum').append(data);
-								$('[role=dialog]').last().find('.ui-button').last().html('<span class="ui-button-text">OK</span>').prev().remove();
-							})
-						} else if ($('select.rhumerie').length == 0){ // ou il n'y a pas de rhumerie à sélectionner
-							e.preventDefault(); e.stopPropagation();
-							$.get("<?php echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=norhumerie',1); ?>", function(data) {
-								$('#selrhum').append(data);
-							})
-						}	
-					}
-				});
+				// Géré côté serveur à présent...
+				// $('#addline').on('click', function(e){
+				//	if($('input[name=prod_entry_mode]:checked').val() == 'predef'){
+				//		if($('#idprod').val() == '' || $('#idprod').val() == '-1' ||  $('#idprod').val() == '0'){ // si on a rien sélectionné
+				//			e.preventDefault();
+				//		} else { // si on a sélectionné un produit
+				//			if(($('input[name="options_rhumerie"]').val() == '-1' || $('input[name="options_rhumerie"]').val() == '') && $('select.rhumerie').length != 0){ // mais pas de rhumerie
+				//				e.preventDefault(); e.stopPropagation();
+				//													
+				//				$.get("<?php //echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=noselect',1); ?>", function(data) {
+				//					$('#selrhum').append(data);
+				//					$('[role=dialog]').last().find('.ui-button').last().html('<span class="ui-button-text">OK</span>').prev().remove();
+				//				})
+				//			} else if ($('select.rhumerie').length == 0){ // ou il n'y a pas de rhumerie à sélectionner
+				//				e.preventDefault(); e.stopPropagation();
+				//				$.get("<?php //echo dol_buildpath('/rhum/card.php?action=ajaxerrors&errors=norhumerie',1); ?>", function(data) {
+				//					$('#selrhum').append(data);
+				//				})
+				//			}	
+				//		}
+				//	}
+				//});
+				
 			});
 			
 			</script>
@@ -220,11 +279,14 @@ class ActionsRhum
 	{
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
-			print '<label>Rhumerie : </label><div id="selrhum" style="display: inline-block;margin-left: 10px;"></div>';
+			print '<div id="selrhum" style="display: inline-block;margin-left: 10px;"></div>';
 
 			?>
 			<script type="text/javascript">
 			$(document).ready(function(){
+				if($('#line_'+<?php print GETPOST('lineid');?>).parent().find('a').length == 0){ // si on est pas dans un produit libre
+					$('#selrhum').prev().remove();
+				}
 				// cache la ligne de l'extrafield
 				$('input[name="options_rhumerie"]').parent().parent().hide();
 

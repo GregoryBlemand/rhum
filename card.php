@@ -66,7 +66,8 @@ if (empty($reshook))
 			}
 			if($i > 0){
 				$form = new Form($db);
-				$output = $form->selectarray('rhumerie', $select, '',1,0,0,'style="width: 120px;"',0,20,0,'','',1);
+				$output = '<label>Rhumerie : </label> ';
+				$output .= $form->selectarray('rhumerie', $select, '',1,0,0,'style="width: 120px;"',0,20,0,'','',1);
 			} else {
 				$output = "<p>Produit disponible dans aucune rhumerie <a href=\"".dol_buildpath('/rhum/list.php', 1)."\">cliquez ici pour l'assigner</a></p>";
 			}
