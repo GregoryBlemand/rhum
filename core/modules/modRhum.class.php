@@ -114,7 +114,7 @@ class modRhum extends DolibarrModules
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',1),
 		//                             1=>array('MYMODULE_MYNEWCONST2','chaine','myvalue','This is another constant to add',0, 'current', 1)
 		// );
-		$this->const = array();
+		$this->const = array(0 => array('RHUMERIE_OBLIGATOIRE','chaine',1,'Selection des rhumeries obligatoire',1, 'current', 1));
 
 		// Array to add new pages in new tabs
 		// Example: $this->tabs = array('objecttype:+tabname1:Title1:rhum@rhum:$user->rights->rhum->read:/rhum/mynewtab1.php?id=__ID__',  	// To add a new tab identified by code tabname1
@@ -206,8 +206,7 @@ class modRhum extends DolibarrModules
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'delete';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		$r++;
-
+		$r++;		
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
@@ -417,8 +416,8 @@ class modRhum extends DolibarrModules
 
 		$result=$this->_load_tables('/rhum/sql/');
 		
+		// création de l'extrafield "rhumerie" pour les lignes de commandes
 		require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-		
 		$extrafields = new ExtraFields($db);
 		$res=$extrafields->addExtraField(
 				'rhumerie',
@@ -439,6 +438,16 @@ class modRhum extends DolibarrModules
 		} else {
 			setEventMessages($langs->trans('extrafieldNotCreated'), null, 'errors');
 		}
+		
+		// Ajout d'un droit au module commande
+		include_once DOL_DOCUMENT_ROOT .'/core/modules/modCommande.class.php';
+		$mod = new modCommande($db);
+		$mod->rights[9][0] = 1046663;
+		$mod->rights[9][1] = 'Ajouter des lignes libres aux commandes';
+		$mod->rights[9][3] = 1;
+		$mod->rights[9][4] = 'lignelibre';
+		$mod->rights[9][5] = '';
+		$mod->insert_permissions(1, null, 1);
 
 		return $this->_init($sql, $options);
 	}
@@ -453,6 +462,8 @@ class modRhum extends DolibarrModules
 	 */
 	function remove($options='')
 	{
+		global $conf, $db;
+		
 		$sql = array();
 		
 		return $this->_remove($sql, $options);

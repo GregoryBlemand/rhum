@@ -217,6 +217,7 @@ class InterfaceRhumtrigger
              * 
              * */
             
+            /*
             $sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'rhumerie WHERE fk_soc = '.$object->socid;
             $res = $this->db->query($sql);
             
@@ -236,6 +237,7 @@ class InterfaceRhumtrigger
             		$rhum->save($PDOdb);
             	}
             }
+            */
             
             
             

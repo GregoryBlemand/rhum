@@ -15,6 +15,7 @@ RhumerieObligatoire=Selectionner une rhumerie pour les produits prédéfinis est
 pbRhum= Erreur !
 rhumEditError=Vous n'avez pas sélectionné de rhumerie !
 noRhumerie=Ce produit n'est disponible dans aucune rhumerie ! Voulez vous l'assigner à une rhumerie ?
+noLibre=Vous n'êtes pas autorisé à créer des lignes libres
 
 # MENU
 TopMenuRhum=Rhumerie
