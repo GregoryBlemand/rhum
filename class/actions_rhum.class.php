@@ -63,8 +63,18 @@ class ActionsRhum
 	{
 		if (in_array('ordercard', explode(':', $parameters['context'])))
 		{
-			global $langs, $conf, $user;
+			global $langs, $conf, $user,$db;
 			$langs->load('rhum@rhum');
+			
+			// Ajout d'un droit au module commande
+			include_once DOL_DOCUMENT_ROOT .'/core/modules/modCommande.class.php';
+			$mod = new modCommande($db);
+			$mod->rights[9][0] = 1046663;
+			$mod->rights[9][1] = 'Ajouter des lignes libres aux commandes';
+			$mod->rights[9][3] = 1;
+			$mod->rights[9][4] = 'lignelibre';
+			$mod->rights[9][5] = '';
+			$mod->insert_permissions(1, null, 1);
 			
 			if(! empty($_POST)){
 				
